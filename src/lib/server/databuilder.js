@@ -1,22 +1,57 @@
 import { base64DefaultAvatorImage } from '$lib/img/defaultavator.js';
 const DEFFAULT_AVATOR = `url(${base64DefaultAvatorImage})`;
 
-export function removeInvalidLinks(elements) {
+export function removeInvalidNodesAndEdges(elements) {
   const validEdges = []; // 有効なエッジを格納する配列
   const validNodes = []; // 有効なノードを格納する配列
+  const nodeIds = new Set(); // ノードIDのセットを作成して存在チェックに使用
+  const connectedNodes = new Set(); // 接続されているノードのIDを格納するセット
+  const remainingCompoundNodes = new Set(); // コンパウンドノードに接続されているノードIDを格納するセット
+  const compoundNodesWithChildren = new Set(); // 子ノードを持つコンパウンドノードのIDを格納するセット
 
-  // 有効なエッジとノードを抽出する
+  // ノードIDをセットに追加
   elements.forEach(element => {
-    if (element.group === 'edges' && element.data && element.data.source && element.data.target) {
-      const sourceExists = elements.some(node => node.group === 'nodes' && node.data.id === element.data.source);
-      const targetExists = elements.some(node => node.group === 'nodes' && node.data.id === element.data.target);
-      if (sourceExists && targetExists) {
-        validEdges.push(element); // 有効なエッジを配列に追加
-      }
-    } else if (element.group === 'nodes') {
-      validNodes.push(element); // 有効なノードを配列に追加
+    if (element.group === 'nodes') {
+      nodeIds.add(element.data.id);
     }
   });
+
+  // 有効なエッジと接続されているノードを抽出する
+  elements.forEach(element => {
+    if (element.group === 'edges' && element.data && element.data.source && element.data.target) {
+      // ソースとターゲットが両方ともノードIDセットに存在する場合に有効なエッジとする
+      if (nodeIds.has(element.data.source) && nodeIds.has(element.data.target)) {
+        validEdges.push(element); // 有効なエッジを配列に追加
+        connectedNodes.add(element.data.source); // 接続されているノードのIDを追加
+        connectedNodes.add(element.data.target); // 接続されているノードのIDを追加
+      }
+    }
+  });
+
+  // 子ノードを持つコンパウンドノードを抽出
+  const validParents = new Set(elements.map(element => element.data.parent));
+  elements.forEach(element => {
+    if (element.group === 'nodes' && validParents.has(element.data.id)) {
+      remainingCompoundNodes.add(element.data.id);
+    }
+  });
+
+  // コンパウンドノードの子ノードに未接続のノードが含まれているかチェック
+  const compoundNodesWithUnconnectedChildren = new Set();
+  elements.forEach(element => {
+    if (element.group === 'nodes' && element.data.parent && !connectedNodes.has(element.data.id)) {
+      compoundNodesWithUnconnectedChildren.add(element.data.parent);
+    }
+  });
+
+  // 未接続のノードが存在するコンパウンドノードを削除する
+  compoundNodesWithUnconnectedChildren.forEach(nodeId => remainingCompoundNodes.delete(nodeId));
+
+  // 接続されているノードまたは子ノードを持つコンパウンドノードだけを有効なノードとして抽出する
+  validNodes.push(...elements.filter(element => 
+    element.group === 'nodes' &&
+    (connectedNodes.has(element.data.id) || remainingCompoundNodes.has(element.data.id))
+  ));
 
   // 元の配列を有効なエッジとノードの配列で置き換える
   elements.length = 0;
@@ -155,5 +190,30 @@ export function groupElementsWithCompoundNodes(elements) {
     return true; // ノード以外（エッジなど）はフィルタリングしない
   });
 
-  return filteredCompoundElements;
+  // 元のエッジを追加する
+  const edges = elements.filter(el => el.group === 'edges');
+
+  // フィルタリングされたノードとエッジを結合して返す
+  return [...filteredCompoundElements, ...edges];
+}
+
+export function removeUnconnectedNodes(elements) {
+  // Extract nodes and edges from the elements array
+  const nodes = elements.filter(el => el.group === 'nodes');
+  const edges = elements.filter(el => el.group === 'edges');
+
+  // Create a Set to store connected nodes
+  const connectedNodes = new Set();
+
+  // Traverse through edges and add source and target nodes to the Set
+  edges.forEach(edge => {
+    connectedNodes.add(edge.data.source);
+    connectedNodes.add(edge.data.target);
+  });
+
+  // Filter out the nodes that are not in the connectedNodes Set
+  const filteredNodes = nodes.filter(node => connectedNodes.has(node.data.id));
+
+  // Combine the filtered nodes with the original edges and return the result
+  return [...filteredNodes, ...edges];
 }

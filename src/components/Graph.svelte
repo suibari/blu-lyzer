@@ -22,6 +22,7 @@
       cyInstance
         .layout({
           name: 'fcose',
+          nestingFactor: 0.5,
           // rankDir: 'TB',
           // nodeSep: 150
         })

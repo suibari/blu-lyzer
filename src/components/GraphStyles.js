@@ -1,7 +1,7 @@
 export default [
   {
-    // コンパウンドノードの子ノード
-    selector: 'node[parent][!groupWord]',
+    // コンパウンドノードの子ノード, 子ノードを持たない親ノード
+    selector: 'node',
     style: {
       'width': '50',
       'height': '50',
@@ -25,56 +25,40 @@ export default [
       'text-valign': 'top',
       'text-halign': 'center',
       'color': '#000',
-      'font-size': '16px',
-      'background-color': '#f4a460',
+      'font-size': '40px', // 大きめにして目立たせる
+      'font-weight': 'bold', // 太字にして目立たせる
+      'background-color': 'blue', // 半透明の背景色
+      'background-opacity': 0.5,
       'border-width': 2,
       'border-color': '#333',
-    }
-  },
-  {
-    // グループに所属しないノード
-    selector: 'node[!parent][!groupWord]', // 親ノードでなく、`name` を持つノード
-    style: {
-      'width': '50',
-      'height': '50',
-      'font-size': '18',
-      'font-weight': 'bold',
-      'content': `data(name)`,
-      'text-valign': 'center',
-      'text-wrap': 'wrap',
-      'text-max-width': '140',
-      'background-color': 'gold',
-      'border-color': 'orange',
-      'border-width': '3',
-      'color': 'darkred'
     }
   },
   {
     selector: 'node:selected',
     style: {
       'background-color': 'darkred',
-      'content': `data(name)`,
+      // 'content': `data(name)`,
       color: 'white',
       'border-color': 'darkred',
       'line-color': '#0e76ba',
       'target-arrow-color': '#0e76ba'
     }
   },
-  // {
-  //   selector: 'edge',
-  //   style: {
-  //     'curve-style': 'bezier',
-  //     'color': 'darkred',
-  //     'text-background-color': '#ffffff',
-  //     'text-background-opacity': '1',
-  //     'text-background-padding': '3',
-  //     'width': '3',
-  //     'target-arrow-shape': 'triangle',
-  //     'line-color': 'darkred',
-  //     'target-arrow-color': 'darkred',
-  //     'font-weight': 'bold'
-  //   }
-  // },
+  {
+    selector: 'edge',
+    style: {
+      'curve-style': 'straight',
+      'color': 'darkred',
+      'text-background-color': '#ffffff',
+      'text-background-opacity': '1',
+      'text-background-padding': '3',
+      'width': '1',
+      'target-arrow-shape': 'triangle',
+      'line-color': 'darkred',
+      'target-arrow-color': 'darkred',
+      'font-weight': 'bold'
+    }
+  },
   // {
   //   selector: 'edge[label]',
   //   style: {

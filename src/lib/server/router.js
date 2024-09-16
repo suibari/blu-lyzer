@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { removeDuplicatesNodes, removeInvalidLinks, groupElementsWithCompoundNodes } from "./databuilder";
+import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes, removeUnconnectedNodes } from "./databuilder";
 
 const RADIUS_THRD_INC_USER = 3;
 const RADIUS_CLIP = 2; // RADIUS_THRD_INC_USER 以下推奨
@@ -62,12 +62,15 @@ export async function getData(handle) {
       }
     }
 
+    // 独立ノード削除
+    // const elementsConnected = removeUnconnectedNodes(elementsFiltered);
+
     // nodeグルーピング処理
-    const compoundElements = groupElementsWithCompoundNodes(elementsFiltered);
+    const elementsCompound = groupElementsWithCompoundNodes(elementsFiltered);
 
-    // 無効リンクの削除
-    removeInvalidLinks(compoundElements);
+    // 無効ノード、リンクの削除
+    removeInvalidNodesAndEdges(elementsCompound);
 
-    return compoundElements;
+    return elementsCompound;
   }
 }
