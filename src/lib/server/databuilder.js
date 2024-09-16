@@ -88,8 +88,8 @@ export function removeDuplicatesNodes(elements) {
 
 export function groupElementsWithCompoundNodes(elements) {
   const compoundElements = [];
-  const wordToParentMap = {};
   const wordToChildrenMap = {};
+  const nodeToCompoundMap = {};
 
   // 各ノードを処理して、単語ごとに子ノードリストを作成
   elements.forEach(element => {
@@ -109,8 +109,8 @@ export function groupElementsWithCompoundNodes(elements) {
   Object.keys(wordToChildrenMap).forEach(word => {
     const children = wordToChildrenMap[word];
 
-    // 子ノードが存在する場合のみコンパウンドノードを追加
-    if (children.length > 0) {
+    // 子ノードが 2 つ以上存在する場合のみコンパウンドノードを作成
+    if (children.length >= 2) {
       const compoundNodeId = `group-${word}`;
       
       // コンパウンドノードの作成
@@ -121,15 +121,39 @@ export function groupElementsWithCompoundNodes(elements) {
 
       // 子ノードに親を設定してコンパウンドノードに含める
       children.forEach(childId => {
-        const element = elements.find(el => el.data.id === childId);
-        compoundElements.push({
-          group: 'nodes',
-          data: { ...element.data, id: childId, parent: compoundNodeId },
-          position: element.position // 元のノードの位置を保持
-        });
+        if (!nodeToCompoundMap[childId]) {
+          const element = elements.find(el => el.data.id === childId);
+          compoundElements.push({
+            group: 'nodes',
+            data: { ...element.data, id: childId, parent: compoundNodeId },
+          });
+          nodeToCompoundMap[childId] = compoundNodeId;
+        }
       });
     }
   });
 
-  return compoundElements;
+  // コンパウンドノードの子ノード数をカウントする
+  const parentToChildrenCount = {};
+
+  compoundElements.forEach(el => {
+    if (el.group === 'nodes' && el.data.parent) {
+      const parentId = el.data.parent;
+      if (!parentToChildrenCount[parentId]) {
+        parentToChildrenCount[parentId] = 0;
+      }
+      parentToChildrenCount[parentId]++;
+    }
+  });
+
+  // 子ノードが 2 つ以上存在しないコンパウンドノードを削除
+  const filteredCompoundElements = compoundElements.filter(el => {
+    if (el.group === 'nodes' && el.data.id.startsWith('group-')) {
+      // コンパウンドノードの子ノード数が 2 未満のものは削除
+      return parentToChildrenCount[el.data.id] >= 2;
+    }
+    return true; // ノード以外（エッジなど）はフィルタリングしない
+  });
+
+  return filteredCompoundElements;
 }

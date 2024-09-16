@@ -63,11 +63,11 @@ export async function getData(handle) {
     }
 
     // nodeグルーピング処理
-    // const compoundElements = groupElementsWithCompoundNodes(elementsFiltered);
+    const compoundElements = groupElementsWithCompoundNodes(elementsFiltered);
 
     // 無効リンクの削除
-    removeInvalidLinks(elementsFiltered);
+    removeInvalidLinks(compoundElements);
 
-    return elementsFiltered;
+    return compoundElements;
   }
 }

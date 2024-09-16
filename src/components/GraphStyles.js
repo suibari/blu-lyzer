@@ -1,6 +1,39 @@
 export default [
   {
-    selector: 'node',
+    // コンパウンドノードの子ノード
+    selector: 'node[parent][!groupWord]',
+    style: {
+      'width': '50',
+      'height': '50',
+      'font-size': '18',
+      'font-weight': 'bold',
+      'content': `data(name)`,
+      'text-valign': 'center',
+      'text-wrap': 'wrap',
+      'text-max-width': '140',
+      'background-color': 'gold',
+      'border-color': 'orange',
+      'border-width': '3',
+      'color': 'darkred'
+    }
+  },
+  {
+    // コンパウンドノード（親ノード）
+    selector: 'node[!parent][groupWord]', // 親ノードのみを対象にする
+    style: {
+      'label': 'data(groupWord)', // コンパウンドノードは `groupWord` フィールドをラベルに使用
+      'text-valign': 'top',
+      'text-halign': 'center',
+      'color': '#000',
+      'font-size': '16px',
+      'background-color': '#f4a460',
+      'border-width': 2,
+      'border-color': '#333',
+    }
+  },
+  {
+    // グループに所属しないノード
+    selector: 'node[!parent][!groupWord]', // 親ノードでなく、`name` を持つノード
     style: {
       'width': '50',
       'height': '50',
@@ -20,20 +53,11 @@ export default [
     selector: 'node:selected',
     style: {
       'background-color': 'darkred',
+      'content': `data(name)`,
       color: 'white',
       'border-color': 'darkred',
       'line-color': '#0e76ba',
       'target-arrow-color': '#0e76ba'
-    }
-  },
-  {
-    selector: '$node > node', // コンパウンドノード用
-    style: {
-      'background-color': '#f0f0f0',
-      'label': 'data(groupWord)',
-      'text-valign': 'center',
-      'text-halign': 'center',
-      'font-size': '18px'
     }
   },
   // {
