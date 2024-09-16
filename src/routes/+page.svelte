@@ -1,5 +1,8 @@
 <script>
+	import Graph from "../components/Graph.svelte";
+
   let inputText = '';
+  let elements = [];
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -13,6 +16,8 @@
     });
 
     const result = await response.json();
+    elements = result.elements;
+    console.log(elements);
   }
 </script>
 
@@ -20,3 +25,5 @@
   <input type="text" bind:value={inputText} placeholder="Enter text here" />
   <button type="submit">Analyze!</button>
 </form>
+
+<Graph {elements}></Graph>

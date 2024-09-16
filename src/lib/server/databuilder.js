@@ -85,3 +85,51 @@ export function removeDuplicatesNodes(elements) {
 
   return result;
 }
+
+export function groupElementsWithCompoundNodes(elements) {
+  const compoundElements = [];
+  const wordToParentMap = {};
+  const wordToChildrenMap = {};
+
+  // 各ノードを処理して、単語ごとに子ノードリストを作成
+  elements.forEach(element => {
+    const { wordFreqMap, id } = element.data;
+
+    if (wordFreqMap) {
+      wordFreqMap.forEach(word => {
+        if (!wordToChildrenMap[word]) {
+          wordToChildrenMap[word] = [];
+        }
+        wordToChildrenMap[word].push(id); // 子ノードリストに追加
+      });
+    }
+  });
+
+  // 子ノードが存在する単語ごとにコンパウンドノードを作成
+  Object.keys(wordToChildrenMap).forEach(word => {
+    const children = wordToChildrenMap[word];
+
+    // 子ノードが存在する場合のみコンパウンドノードを追加
+    if (children.length > 0) {
+      const compoundNodeId = `group-${word}`;
+      
+      // コンパウンドノードの作成
+      compoundElements.push({
+        group: 'nodes',
+        data: { id: compoundNodeId, groupWord: word }
+      });
+
+      // 子ノードに親を設定してコンパウンドノードに含める
+      children.forEach(childId => {
+        const element = elements.find(el => el.data.id === childId);
+        compoundElements.push({
+          group: 'nodes',
+          data: { ...element.data, id: childId, parent: compoundNodeId },
+          position: element.position // 元のノードの位置を保持
+        });
+      });
+    }
+  });
+
+  return compoundElements;
+}
