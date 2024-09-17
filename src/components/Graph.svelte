@@ -5,6 +5,7 @@
   import GraphStyles from './GraphStyles.js';
 
   export let elements = [];
+  export let tappedNode = null;
 
   let container;
   let cyInstance = null;
@@ -27,7 +28,12 @@
           // nodeSep: 150
         })
         .run()
-    })
+    });
+
+    // カード表示
+    cyInstance.on('tap', 'node', (evt) => {
+      tappedNode = evt.target;
+    });
   })
 
   $: if (cyInstance) {

@@ -4,7 +4,6 @@ import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCom
 const RADIUS_THRD_INC_USER = 3;
 const RADIUS_CLIP = 2; // RADIUS_THRD_INC_USER 以下推奨
 
-
 export async function getData(handle) {
   // handleが相関図内に含まれる相関図データをすべて取得(中心が自分を問わない)
   // elements[].data.handleが引数handleに一致する行をすべて取得
@@ -61,9 +60,6 @@ export async function getData(handle) {
         // if (progressCallback) progressCallback(progress);
       }
     }
-
-    // 独立ノード削除
-    // const elementsConnected = removeUnconnectedNodes(elementsFiltered);
 
     // nodeグルーピング処理
     const elementsCompound = groupElementsWithCompoundNodes(elementsFiltered);

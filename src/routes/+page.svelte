@@ -1,8 +1,12 @@
 <script>
+  // flowbite-svelte
+  // my components
 	import Graph from "../components/Graph.svelte";
+	import UserCard from "../components/UserCard.svelte";
 
   let inputText = '';
   let elements = [];
+  let tappedNode = null;
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -26,4 +30,11 @@
   <button type="submit">Analyze!</button>
 </form>
 
-<Graph {elements}></Graph>
+<Graph
+  {elements}
+  bind:tappedNode
+/>
+
+<UserCard
+  {tappedNode}
+/>

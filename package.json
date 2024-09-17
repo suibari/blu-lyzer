@@ -31,6 +31,9 @@
 	"dependencies": {
 		"@supabase/supabase-js": "^2.45.4",
 		"cytoscape": "^3.30.2",
-		"cytoscape-fcose": "^2.2.0"
+		"cytoscape-fcose": "^2.2.0",
+		"flowbite": "^2.5.1",
+		"flowbite-svelte": "^0.46.16",
+		"flowbite-svelte-icons": "^1.6.1"
 	}
 }
