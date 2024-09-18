@@ -23,6 +23,22 @@
     elements = result.elements;
     console.log(elements);
   }
+
+  async function expandGraph(event) {
+    const handle = event.detail;
+
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: handle })
+    });
+
+    const result = await response.json();
+    elements = result.elements;
+    console.log(elements);
+  }
 </script>
 
 <form on:submit={handleSubmit}>
@@ -36,5 +52,6 @@
 />
 
 <UserCard
-  {tappedNode}
+  bind:tappedNode
+  on:expandGraph={expandGraph}
 />

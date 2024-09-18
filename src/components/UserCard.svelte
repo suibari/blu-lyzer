@@ -3,11 +3,13 @@
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
 	import ActiveHistgram from './ActiveHistgram.svelte';
+  import { createEventDispatcher } from 'svelte';
 
   export let tappedNode = null;
   let lastActionTimeText = "";
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
+  const dispatch = createEventDispatcher();
 
   function getLastActionText(lastActionTime) {
     const now = new Date();
@@ -41,7 +43,7 @@
     if (diffInMinutes < 60) {
       return 'green';
     } else if (diffInHours < 24) {
-      return 'green';
+      return 'yellow';
     } else if (diffInDays < 30) {
       return 'red';
     } else {
@@ -53,7 +55,6 @@
     if (tappedNode && tappedNode.data('lastActionTime')) {
       lastActionTimeText = getLastActionText(tappedNode.data('lastActionTime'));
       lastActionTimeColor = getLastActionColor(tappedNode.data('lastActionTime'));
-      console.log(lastActionTimeColor)
     }
   }
 
@@ -76,10 +77,16 @@
 
 <div class="user-card">
   <Card class="max-w-none">
-    {#if (tappedNode.data('name'))}
+    {#if (tappedNode && tappedNode.data('name'))}
       <div class="flex items-center">
         <div class="flex-none">
-          <Avatar src={tappedNode.data('img')} size="l" dot={{ color: lastActionTimeColor, size: 'xl' }} />
+          <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
+            <Avatar
+              src={tappedNode.data('img')}
+              size="l"
+              dot={{ color: lastActionTimeColor, size: 'xl' }}
+            />
+          </a>
           <Tooltip>{lastActionTimeText}</Tooltip>
         </div>
         <div class="flex flex-col flex-grow ml-4">
@@ -116,7 +123,7 @@
               </div>
             </div>
           </div>
-          <Button class="w-fit h-10">
+          <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', tappedNode.data('handle'))}>
             Expand Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
           </Button>
         </div>

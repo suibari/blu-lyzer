@@ -3,6 +3,7 @@
   import cytoscape from 'cytoscape';
   import fcose from 'cytoscape-fcose';
   import GraphStyles from './GraphStyles.js';
+  import GraphLayout from './GraphLayout.js';
 
   export let elements = [];
   export let tappedNode = null;
@@ -21,12 +22,7 @@
 
     cyInstance.on('add', () => {
       cyInstance
-        .layout({
-          name: 'fcose',
-          nestingFactor: 0.5,
-          // rankDir: 'TB',
-          // nodeSep: 150
-        })
+        .layout(GraphLayout)
         .run()
     });
 
