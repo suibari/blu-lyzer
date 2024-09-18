@@ -57,10 +57,16 @@ export default {
 
   // ノードの反発（重ならない）倍率
   // nodeRepulsion: node => 4500,
-  nodeRepulsion: node => 10000,
+  nodeRepulsion: node => {
+    if (node.isParent()) {
+      return 10^10;
+    }
+    return 10^4;
+  },
 
   // 理想的なエッジ（ネストしていない）の長さ
-  idealEdgeLength: edge => 50,
+  // idealEdgeLength: edge => 50,
+  idealEdgeLength: edge => 150,
 
   // エッジの力を計算するための除数
   edgeElasticity: edge => 0.45,

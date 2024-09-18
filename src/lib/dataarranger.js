@@ -12,6 +12,10 @@ export function removeDuplicatesNodes(elements) {
   return result;
 }
 
+/**
+ * どのエッジにも繋がっていない子ノード、コンパウンドノードを削除
+ * どのノードにも繋がっていないエッジを削除
+ */
 export function removeInvalidNodesAndEdges(elements) {
   const validEdges = []; // 有効なエッジを格納する配列
   const validNodes = []; // 有効なノードを格納する配列
@@ -69,10 +73,16 @@ export function removeInvalidNodesAndEdges(elements) {
   elements.push(...validNodes, ...validEdges);
 }
 
+/**
+ * 引数のelementsをコンパウンドノード化する
+ */
 export function groupElementsWithCompoundNodes(elements) {
   const compoundElements = [];
   const wordToChildrenMap = {};
   const nodeToCompoundMap = {};
+
+  // expand時用に最初に重複ノード削除
+  removeDuplicatesNodes(elements);
 
   // 各ノードを処理して、単語ごとに子ノードリストを作成
   elements.forEach(element => {

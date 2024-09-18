@@ -1,9 +1,12 @@
 <script>
+  // svelte
+  import { createEventDispatcher, onMount } from 'svelte';
+  // flowbite-svelte
   import { Card, Button } from 'flowbite-svelte';
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
+  // my components
 	import ActiveHistgram from './ActiveHistgram.svelte';
-  import { createEventDispatcher } from 'svelte';
 
   export let inputText = "";
   export let tappedNode = null;
@@ -11,6 +14,14 @@
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
   const dispatch = createEventDispatcher();
+
+  onMount(() => {
+    // ローカルストレージからセット
+    const storedHandle = localStorage.getItem('handle');
+    if (storedHandle) {
+      inputText = storedHandle;
+    }
+  })
 
   function handleKeyDown(event) {
     if (event.key === 'Enter') {

@@ -19,15 +19,21 @@ export default [
   },
   {
     // コンパウンドノード（親ノード）
-    selector: 'node[!parent][groupWord]', // 親ノードのみを対象にする
+    selector: 'node[^parent][groupWord][backgroundColor][color]', // 親ノードのみを対象にする
     style: {
-      'label': 'data(groupWord)', // コンパウンドノードは `groupWord` フィールドをラベルに使用
+      'color': 'data(color)',
+      'background-color': 'data(backgroundColor)',
+    }
+  },
+  {
+    // コンパウンドノード（親ノード）: デフォルトスタイル
+    selector: 'node[^parent][groupWord]', // 親ノードのみを対象にする
+    style: {
+      'label': 'data(groupWord)',
       'text-valign': 'top',
       'text-halign': 'center',
-      'color': '#000',
-      'font-size': '40px', // 大きめにして目立たせる
-      'font-weight': 'bold', // 太字にして目立たせる
-      'background-color': 'blue', // 半透明の背景色
+      'font-size': '40px',
+      'font-weight': 'bold',
       'background-opacity': 0.5,
       'border-width': 2,
       'border-color': '#333',
