@@ -4,6 +4,7 @@
   import fcose from 'cytoscape-fcose';
   import GraphStyles from './GraphStyles.js';
   import GraphLayout from './GraphLayout.js';
+  import { removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from '$lib/dataarranger';
 
   export let elements = [];
   export let tappedNode = null;
@@ -39,6 +40,8 @@
       const newElements = elements.filter(e => !currentElements.includes(e.data.id));
 
       if (newElements.length > 0) {
+        console.log('arrange elements...');
+        removeInvalidNodesAndEdges(newElements);
         console.log('adding elements...');
         cyInstance.add(newElements);
         console.log('added elements!');

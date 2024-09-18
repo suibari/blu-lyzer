@@ -5,11 +5,18 @@
 	import ActiveHistgram from './ActiveHistgram.svelte';
   import { createEventDispatcher } from 'svelte';
 
+  export let inputText = "";
   export let tappedNode = null;
   let lastActionTimeText = "";
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
   const dispatch = createEventDispatcher();
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      dispatch('expandGraph', inputText);
+    }
+  }
 
   function getLastActionText(lastActionTime) {
     const now = new Date();
@@ -132,6 +139,16 @@
           <ActiveHistgram {tappedNode}/>
         </div>
       </div>
+    {:else}
+      <input 
+        type="text"
+        bind:value={inputText}
+        on:keydown={handleKeyDown}
+        placeholder="handle.bsky.social"
+      />
+      <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', inputText)}>
+        Create Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
+      </Button>
     {/if}
   </Card>
 </div>

@@ -1,10 +1,10 @@
 export default [
   {
     // コンパウンドノードの子ノード, 子ノードを持たない親ノード
-    selector: 'node',
+    selector: 'node[parent], node[^parent][name]',
     style: {
-      'width': '50',
-      'height': '50',
+      'width': 'data(rank)',
+      'height': 'data(rank)',
       'font-size': '18',
       'font-weight': 'bold',
       'content': `data(name)`,

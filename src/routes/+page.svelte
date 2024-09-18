@@ -3,6 +3,7 @@
   // my components
 	import Graph from "../components/Graph.svelte";
 	import UserCard from "../components/UserCard.svelte";
+  import './+page.css';
 
   let inputText = '';
   let elements = [];
@@ -41,17 +42,16 @@
   }
 </script>
 
-<form on:submit={handleSubmit}>
-  <input type="text" bind:value={inputText} placeholder="Enter text here" />
-  <button type="submit">Analyze!</button>
-</form>
-
-<Graph
-  {elements}
-  bind:tappedNode
-/>
+<div class="z-1">
+  <Graph
+    {elements}
+    bind:tappedNode
+  />
+</div>
 
 <UserCard
+  bind:inputText
   bind:tappedNode
+  on:handleSubmit={handleSubmit}
   on:expandGraph={expandGraph}
 />

@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes, removeUnconnectedNodes } from "./databuilder";
+import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 
 const RADIUS_THRD_INC_USER = 3;
 const RADIUS_CLIP = 2; // RADIUS_THRD_INC_USER 以下推奨
