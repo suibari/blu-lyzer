@@ -9,6 +9,7 @@
 
   export let elements = [];
   export let tappedNode = null;
+  export let recentFriends = [];
 
   let container;
   let cyInstance = null;
@@ -38,6 +39,7 @@
 
     // カード表示
     cyInstance.on('tap', 'node', (evt) => {
+      recentFriends = []; // ここで初期化しないと表示がおかしくなる
       tappedNode = evt.target;
     });
 
@@ -101,6 +103,30 @@
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+  }
+
+  function getRecentFriendRanking() {
+    const friends = tappedNode.data('recentFriends');
+
+    if (friends && friends.length > 0) {
+      for (const friend of friends) {
+        const match = elements.find(element => element.data.id === friend.did);
+        const isMyself = (tappedNode.data('id') === friend.did);
+        if (match && !isMyself) {
+          const img = match.data.img;
+          const name = match.data.name;
+          const score = friend.score;
+
+          recentFriends.push({name, img, score});
+        }
+      }
+    }
+  }
+
+  $: {
+    if (tappedNode && tappedNode.data('recentFriends')) {
+      getRecentFriendRanking();
+    }
   }
 </script>
 

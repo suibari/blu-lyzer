@@ -1,6 +1,9 @@
 import { supabase } from "./supabase";
+import { setInvolvedEngagements } from "./databuilder";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 
+const SCORE_REPLY = 10;
+const SCORE_LIKE = 1;
 const RADIUS_THRD_INC_USER = 3;
 const RADIUS_CLIP = 2; // RADIUS_THRD_INC_USER 以下推奨
 
@@ -42,7 +45,7 @@ export async function getData(handle) {
     // 解析データセット
     const nodes = elementsFiltered.filter(element => (element.group === 'nodes'));
     const handles = nodes.map(node => node.data.handle);
-    ({data, error} = await supabase.from('records').select('handle, result_analyze').in('handle', handles)); // 周辺ユーザの解析データ取得
+    ({data, error} = await supabase.from('records').select('handle, records, result_analyze').in('handle', handles)); // 周辺ユーザの解析データ取得
     if (data.length > 0) {
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
@@ -53,6 +56,9 @@ export async function getData(handle) {
           node.data.averageInterval = match.result_analyze.averageInterval;
           node.data.lastActionTime = match.result_analyze.lastActionTime;
           node.data.wordFreqMap = match.result_analyze.wordFreqMap;
+
+          // 最近の仲良し追加
+          setInvolvedEngagements(node, match.records.posts, match.records.likes, SCORE_REPLY, SCORE_LIKE);
         }
         
         // 進捗をiに応じて加算

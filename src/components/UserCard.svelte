@@ -10,6 +10,7 @@
 
   export let inputText = "";
   export let tappedNode = null;
+  export let recentFriends = [];
   let lastActionTimeText = "";
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
@@ -97,16 +98,31 @@
   <Card class="max-w-none">
     {#if (tappedNode && tappedNode.data('name'))}
       <div class="flex items-center">
-        <div class="flex-none">
-          <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
-            <Avatar
-              src={tappedNode.data('img')}
-              size="l"
-              dot={{ color: lastActionTimeColor, size: 'xl' }}
-            />
-          </a>
-          <Tooltip>{lastActionTimeText}</Tooltip>
+        <!-- アバター欄 -->
+        <div class="flex-col">
+          <div>
+            <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
+              <Avatar
+                src={tappedNode.data('img')}
+                size="l"
+                dot={{ color: lastActionTimeColor, size: 'xl' }}
+              />
+            </a>
+            <Tooltip>{lastActionTimeText}</Tooltip>
+          </div>
+          <h5 class="mt-2">Recent Friends:</h5>
+          <div class="flex items-center gap-1 ">
+            {#if recentFriends.length > 0}
+              {#each recentFriends.slice(0, 3) as friend, i}
+                <Avatar src={friend.img} />
+                <Tooltip>{friend.name}</Tooltip>
+              {/each}
+            {:else}
+              <h5 class="font-bold">None in this graph.</h5>
+            {/if}
+          </div>
         </div>
+        <!-- テキスト欄 -->
         <div class="flex flex-col flex-grow ml-4">
           <div class="flex items-end">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -117,21 +133,15 @@
             </h5>
           </div>
           <div class="flex-col">
-            <div class="flex">
-              <!-- <div class="flex items-end mb-2">
-                <h5>Last Action:</h5>
-                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{lastActionTimeText}</h3>
-              </div> -->
               <div class="flex items-end mb-2">
                 <h5>Time on Bluesky:</h5>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{timeOnBskyText}d</h3>
               </div>
-              <div class="flex items-end mb-2 ml-4">
+              <div class="flex items-end mb-2">
                 <h5>Avg-Act. Interval:</h5>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(tappedNode.data('averageInterval')/60)}</h3>
                 <h5 class="ml-1">[m/act]</h5>
               </div>
-            </div>
             <div class="flex">
               <div class="flex items-end mb-2">
                 <h5>Recent Boom:</h5>
@@ -145,6 +155,7 @@
             Expand Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
           </Button>
         </div>
+        <!-- タイムライン欄 -->
         <div class="w-48 flex-col">
           <h5 class="mb-4">Activity Timeline:</h5>
           <ActiveHistgram {tappedNode}/>

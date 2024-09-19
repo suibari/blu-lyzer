@@ -1,6 +1,83 @@
 import { base64DefaultAvatorImage } from '$lib/img/defaultavator.js';
 const DEFFAULT_AVATOR = `url(${base64DefaultAvatorImage})`;
 
+/**
+ * あるユーザの他のユーザ全員に対するエンゲージメントを取得し、elementsにセット
+ */
+export function setInvolvedEngagements(element, handlesPosts, handlesLikes, SCORE_REPLY, SCORE_LIKE) {
+  let didReply = [];
+  let didLike = [];
+  let resultArray = [];
+
+  // リプライ相手の取得
+  for (const post of handlesPosts) {
+    const uri = post.value.reply?.parent.uri;
+    if (uri) {
+      const did = uri.match(/did:plc:\w+/); // uriからdid部分のみ抜き出し
+      if (did) {
+        didReply.push(did[0]);
+      }
+    }
+  };
+
+  // for posts[]
+  for (const did of didReply) {
+    let flagFound = false;
+    for (const node of resultArray) {
+      if (did == node.did) {
+        node.score = node.score + SCORE_REPLY;
+        if (node.replyCount) {
+          node.replyCount++;
+        } else {
+          node.replyCount = 1;
+        }
+        flagFound = true;
+        break;
+      };
+    };
+    if (!flagFound) {
+      resultArray.push({did: did, score: SCORE_REPLY, replyCount: 1});
+    };
+  };
+
+  // いいね相手の取得
+  for (const like of handlesLikes) {
+    const uri = like.value.subject.uri;
+    const did = uri.match(/did:plc:\w+/); // uriからdid部分のみ抜き出し
+    if (did) {
+      didLike.push(did[0]);
+    };
+  };
+
+  // for likes[]
+  for (const did of didLike) {
+    let flagFound = false;
+    for (const node of resultArray) {
+      if (did == node.did) {
+        node.score = node.score + SCORE_LIKE;
+        if (node.likeCount) {
+          node.likeCount++;
+        } else {
+          node.likeCount = 1;
+        }
+        flagFound = true;
+        break;
+      };
+    };
+    if (!flagFound) {
+      resultArray.push({did: did, score: SCORE_LIKE, likeCount: 1});
+    };
+  };
+
+  if (resultArray.length > 0) {
+    // scoreで降順ソート
+    resultArray.sort((a, b) => b.score - a.score);
+    
+    // エンゲージメントスコアを格納しておく
+    element.data.recentFriends = resultArray;
+  }
+}
+
 export async function imageUrlToBase64(imageUrl) {
   // アバターがない場合デフォルト画像を設定
   if (!(imageUrl)) {

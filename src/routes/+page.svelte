@@ -8,6 +8,7 @@
   let inputText = '';
   let elements = [];
   let tappedNode = null;
+  let recentFriends = [];
 
   async function expandGraph(event) {
     const handle = event.detail;
@@ -36,11 +37,13 @@
   <Graph
     {elements}
     bind:tappedNode
+    bind:recentFriends
   />
 </div>
 
 <UserCard
   bind:inputText
   bind:tappedNode
+  {recentFriends}
   on:expandGraph={expandGraph}
 />
