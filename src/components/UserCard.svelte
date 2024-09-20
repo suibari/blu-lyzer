@@ -8,9 +8,10 @@
   // my components
 	import ActiveHistgram from './ActiveHistgram.svelte';
 
-  export let inputText = "";
+  
   export let tappedNode = null;
   export let recentFriends = [];
+  let inputHandle = "";
   let lastActionTimeText = "";
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
@@ -20,13 +21,13 @@
     // ローカルストレージからセット
     const storedHandle = localStorage.getItem('handle');
     if (storedHandle) {
-      inputText = storedHandle;
+      inputHandle = storedHandle;
     }
   })
 
   function handleKeyDown(event) {
     if (event.key === 'Enter') {
-      dispatch('expandGraph', inputText);
+      dispatch('expandGraph', inputHandle);
     }
   }
 
@@ -164,11 +165,11 @@
     {:else}
       <input 
         type="text"
-        bind:value={inputText}
+        bind:value={inputHandle}
         on:keydown={handleKeyDown}
         placeholder="handle.bsky.social"
       />
-      <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', inputText)}>
+      <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', inputHandle)}>
         Create Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
       </Button>
     {/if}

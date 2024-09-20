@@ -1,8 +1,18 @@
 export function removeDuplicatesNodes(elements) {
-  const uniqueDataWithId = new Map(
-    elements.filter(element => element.data.id !== undefined).map(element => [element.data.id, element])
-  );
-  
+  const uniqueDataWithId = new Map();
+
+  elements.forEach(element => {
+    const id = element.data.id;
+    if (id !== undefined) {
+      const existingElement = uniqueDataWithId.get(id);
+      
+      // 既存の要素がない場合、または level が大きい場合に更新
+      if (!existingElement || (element.data.level > existingElement.data.level)) {
+        uniqueDataWithId.set(id, element);
+      }
+    }
+  });
+
   // id がないオブジェクトをそのまま残す
   const dataWithoutId = elements.filter(element => element.data.id === undefined);
   
@@ -11,6 +21,7 @@ export function removeDuplicatesNodes(elements) {
 
   return result;
 }
+
 
 /**
  * どのエッジにも繋がっていない子ノード、コンパウンドノードを削除

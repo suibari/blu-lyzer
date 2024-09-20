@@ -51,6 +51,24 @@ export default [
     }
   },
   {
+    selector: 'node.todirect',
+    style: {
+      'background-color': 'blue',
+    }
+  },
+  {
+    selector: 'node.fromdirect',
+    style: {
+      'background-color': 'green',
+    }
+  },
+  {
+    selector: 'node.bidirect',
+    style: {
+      'background-color': 'lightblue',
+    }
+  },
+  {
     selector: 'edge',
     style: {
       'curve-style': 'straight',

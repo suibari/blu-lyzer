@@ -5,20 +5,20 @@
 	import UserCard from "../components/UserCard.svelte";
   import './+page.css';
 
-  let inputText = '';
+  let inputHandle = '';
   let elements = [];
   let tappedNode = null;
   let recentFriends = [];
 
   async function expandGraph(event) {
-    const handle = event.detail;
+    inputHandle = event.detail;
 
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ text: handle })
+      body: JSON.stringify({ text: inputHandle })
     });
 
     if (response.ok) {
@@ -26,7 +26,7 @@
       elements = result.elements;
       console.log(elements);
 
-      localStorage.setItem('handle', handle);
+      localStorage.setItem('handle', inputHandle);
     } else {
       // エラー
     } 
@@ -42,7 +42,6 @@
 </div>
 
 <UserCard
-  bind:inputText
   bind:tappedNode
   {recentFriends}
   on:expandGraph={expandGraph}
