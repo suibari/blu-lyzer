@@ -3,22 +3,20 @@
   // my components
 	import Graph from "../components/Graph.svelte";
 	import UserCard from "../components/UserCard.svelte";
-  import './+page.css';
 
-  let inputHandle = '';
   let elements = [];
   let tappedNode = null;
   let recentFriends = [];
 
   async function expandGraph(event) {
-    inputHandle = event.detail;
+    const detail = event.detail;
 
     const response = await fetch('/api/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ text: inputHandle })
+      body: JSON.stringify({ handle: detail.handle })
     });
 
     if (response.ok) {
@@ -26,7 +24,9 @@
       elements = result.elements;
       console.log(elements);
 
-      localStorage.setItem('handle', inputHandle);
+      if (detail.setStrage) {
+        localStorage.setItem('handle', detail.handle);
+      }
     } else {
       // エラー
     } 

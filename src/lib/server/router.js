@@ -4,10 +4,12 @@ import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCom
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
-const RADIUS_THRD_INC_USER = 2;
+const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1; // RADIUS_THRD_INC_USER 以下推奨
 
 export async function getData(handle) {
+  let elementsFinal = [];
+
   // handleが相関図内に含まれる相関図データをすべて取得(中心が自分を問わない)
   // elements[].data.handleが引数handleに一致する行をすべて取得
   let { data, error } = await supabase
@@ -67,12 +69,8 @@ export async function getData(handle) {
       }
     }
 
-    // nodeグルーピング処理
-    const elementsCompound = groupElementsWithCompoundNodes(elementsFiltered);
+    // nodeグルーピング、無効ノードエッジの削除はクライアント側で行う
 
-    // 無効ノード、リンクの削除
-    removeInvalidNodesAndEdges(elementsCompound);
-
-    return elementsCompound;
+    return elementsFiltered;
   }
 }

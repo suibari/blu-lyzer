@@ -37,10 +37,10 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 90%;
+    width: 200px;
     margin-left: auto;
     margin-right: auto;
-    height: 100px;
+    height: 150px;
     padding-bottom: 20px;
     gap: 2px;
   }
@@ -66,10 +66,5 @@
   }
   .max-bar {
     background-color: #ff8a80 !important;
-  }
-  @media screen and (max-width: 600px) {
-    .histogram-container {
-      height: 100px;
-    }
   }
 </style>

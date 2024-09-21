@@ -14,6 +14,7 @@
 
   let container;
   let cyInstance = null;
+  let concatElements = [];
 
   if (PUBLIC_NODE_ENV === 'production') {
     cytoscape.warnings(false);
@@ -80,11 +81,10 @@
 
       if (newElements.length > 0) {
         // 旧elementsと新elementsを結合し、再グルーピング
-        const concatElements = groupElementsWithCompoundNodes(currentElements.concat(newElements));
+        concatElements = groupElementsWithCompoundNodes(currentElements.concat(newElements));
         
         // グルーピングで余ったコンパウンドノードを削除
         removeInvalidNodesAndEdges(concatElements);
-        console.log('arrange elements...');
         
         // コンパウンドノードへのランダムカラー設定
         setRandomColorsForCompoundElements(concatElements);

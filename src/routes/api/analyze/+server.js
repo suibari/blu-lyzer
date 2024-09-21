@@ -1,10 +1,10 @@
 import { getData } from "$lib/server/router";
 
 export async function POST({ request }) {
-  const { text } = await request.json();
-  console.log(`[INFO] received request: ${text}`);
+  const { handle } = await request.json();
+  console.log(`[INFO] received request: ${handle}`);
 
-  const elements = await getData(text);
+  const elements = await getData(handle);
 
   return new Response(JSON.stringify({ elements }), {
     headers: { 'Content-Type': 'application/json' }
