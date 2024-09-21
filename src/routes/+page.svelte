@@ -66,11 +66,6 @@
   </div>
 {/if}
 
-<Alert
-  bind:showErrorAlert
-  messageAlert={messageErrorAlert}
-/>
-
 <div class="z-1">
   <Graph
     {elements}
@@ -79,6 +74,11 @@
     bind:recentFriends
   />
 </div>
+
+<Alert
+  bind:showErrorAlert
+  messageAlert={messageErrorAlert}
+/>
 
 <UserCard
   bind:tappedNode

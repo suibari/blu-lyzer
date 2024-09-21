@@ -97,7 +97,7 @@
   }
 
   $: {
-    if (tappedNode) {
+    if (tappedNode && tappedNode.data('name')) {
       promiseImgTappedNode = getProxyUrlForImage(tappedNode.data('img'));
     }
   }

@@ -130,7 +130,7 @@
         cyInstance.add(concatElements);
         console.log('added elements!');
       } else {
-        messageInfoAlert = "The Graph could not be expanded because no expandable data was found."
+        messageInfoAlert = 'Cannot expand graph because no expandable data was found in "Hirogaru-Bluesky!".';
         showInfoAlert = true;
         isRunning = false;
       }
