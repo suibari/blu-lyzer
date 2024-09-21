@@ -1,4 +1,5 @@
 <script>
+  // my components
   import { PUBLIC_NODE_ENV } from '$env/static/public';
   import { onMount } from 'svelte';
   import cytoscape from 'cytoscape';
@@ -7,6 +8,7 @@
   import GraphLayout from './GraphLayout.js';
   import { removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from '$lib/dataarranger';
   import { getProxyUrlForImage } from '$lib/imgfetch';
+	import Alert from './Alert.svelte';
 
   export let elements = [];
   export let tappedNode = null;
@@ -18,6 +20,8 @@
   let cyInstance = null;
   let concatElements = [];
   let currentElements = [];
+  let showInfoAlert = false;
+  let messageInfoAlert = "";
 
   if (PUBLIC_NODE_ENV === 'production') {
     cytoscape.warnings(false);
@@ -89,6 +93,7 @@
     })
   })
 
+  // elementsが変化したときのメインのリアクティブ処理
   $: if (cyInstance) {
     // 現在のelementsが新しく追加される要素と異なる場合のみ追加処理を行う
     if (elements.length > 0) {
@@ -114,7 +119,7 @@
         // 旧elementsと新elementsを結合し、再グルーピング
         concatElements = groupElementsWithCompoundNodes(currentElements.concat(newNodes).concat(newEdges));
         
-        // グルーピングで余ったコンパウンドノードを削除
+        // グルーピングで余ったコンパウンドノード、未接続ノード、未接続エッジを削除
         removeInvalidNodesAndEdges(concatElements);
         
         // コンパウンドノードへのランダムカラー設定
@@ -125,6 +130,8 @@
         cyInstance.add(concatElements);
         console.log('added elements!');
       } else {
+        messageInfoAlert = "The Graph could not be expanded because no expandable data was found."
+        showInfoAlert = true;
         isRunning = false;
       }
     }
@@ -213,13 +220,23 @@
     });
   }
 
-
   $: {
     if (tappedNode) {
       updateConnectedNodeStyles();
     }
   }
 </script>
+
+<div class="graph" bind:this={container}>
+  {#if cyInstance}
+    <slot></slot>
+  {/if}
+</div>
+
+<Alert
+  bind:showInfoAlert
+  messageAlert={messageInfoAlert}
+/>
 
 <style>
   .graph {
@@ -229,9 +246,3 @@
     padding: 0;
   }
 </style>
-
-<div class="graph" bind:this={container}>
-  {#if cyInstance}
-    <slot></slot>
-  {/if}
-</div>

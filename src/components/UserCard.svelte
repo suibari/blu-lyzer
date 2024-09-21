@@ -188,15 +188,19 @@
         </div>
       </div>
     {:else}
-      <input 
-        type="text"
-        bind:value={inputHandle}
-        on:keydown={handleKeyDown}
-        placeholder="handle.bsky.social"
-      />
-      <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', {handle: inputHandle, setStrage: true})}>
-        Create Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
-      </Button>
+      <div class="flex-col text-center">
+        <input 
+          type="text"
+          bind:value={inputHandle}
+          on:keydown={handleKeyDown}
+          placeholder="handle.bsky.social"
+          class="w-2/3"
+        />
+        <Button class="w-100 h-10 ml-2 mt-2" on:click={() => dispatch('expandGraph', {handle: inputHandle, setStrage: true})}>
+          Create New Graph!
+          <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
+        </Button>
+      </div>
     {/if}
   </Card>
 </div>

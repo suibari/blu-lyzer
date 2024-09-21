@@ -42,9 +42,6 @@ export function removeInvalidNodesAndEdges(elements) {
     }
   });
 
-  console.log(nodeIds.has("did:plc:ipj5qejfoqu6eukvt72uhyit"));
-  console.log(nodeIds.has("did:plc:ilxxgyz7oz7mysber4omeqrg"));
-
   // 有効なエッジと接続されているノードを抽出する
   elements.forEach(element => {
     if (element.group === 'edges' && element.data && element.data.source && element.data.target) {
