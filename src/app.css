@@ -12,3 +12,7 @@ html {
   overflow: hidden;
   background: radial-gradient(circle at center, #ffffff 0%, #38cbdf 100%);
 }
+
+a {
+  color: #3b82f6;
+}
