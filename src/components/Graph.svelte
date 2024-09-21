@@ -6,6 +6,7 @@
   import GraphStyles from './GraphStyles.js';
   import GraphLayout from './GraphLayout.js';
   import { removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from '$lib/dataarranger';
+  import { getProxyUrlForImage } from '$lib/imgfetch';
 
   export let elements = [];
   export let tappedNode = null;
@@ -116,6 +117,8 @@
     return color;
   }
 
+  // 最近の仲良しランキングのセット
+  // ただ、404などが返るかチェックしにいくのはブラウザのCORSポリシーでブロックされるのでサーバ側でプロキシする
   function getRecentFriendRanking() {
     const friends = tappedNode.data('recentFriends');
 
@@ -124,12 +127,14 @@
         const match = elements.find(element => element.data.id === friend.did);
         const isMyself = (tappedNode.data('id') === friend.did);
         if (match && !isMyself) {
-          const img = match.data.img;
+          const img = getProxyUrlForImage(match.data.img);
           const name = match.data.name;
           const score = friend.score;
 
           recentFriends.push({name, img, score});
         }
+
+        if (recentFriends.length === 3) break;
       }
     }
   }

@@ -7,7 +7,8 @@
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
   // my components
 	import ActiveHistgram from './ActiveHistgram.svelte';
-
+  // js
+  import { getProxyUrlForImage } from '$lib/imgfetch';
   
   export let tappedNode = null;
   export let recentFriends = [];
@@ -15,6 +16,7 @@
   let lastActionTimeText = "";
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
+  let promiseImgTappedNode;
   const dispatch = createEventDispatcher();
 
   onMount(() => {
@@ -93,6 +95,12 @@
       timeOnBskyText = calculateDaysSince(tappedNode.data('createdAt'));
     }
   }
+
+  $: {
+    if (tappedNode) {
+      promiseImgTappedNode = getProxyUrlForImage(tappedNode.data('img'));
+    }
+  }
 </script>
 
 <div class="user-card">
@@ -102,21 +110,36 @@
         <!-- アバター欄 -->
         <div class="flex-col mr-2">
           <div>
-            <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
-              <Avatar
-                src={tappedNode.data('img')}
-                size="l"
-                dot={{ color: lastActionTimeColor, size: 'xl' }}
-              />
-            </a>
-            <Tooltip>{lastActionTimeText}</Tooltip>
+            {#await promiseImgTappedNode then imgUrl}
+              <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
+                <Avatar
+                  src={imgUrl}
+                  size="xl"
+                  dot={{ color: lastActionTimeColor, size: 'xl' }}
+                />
+              </a>
+              <Tooltip>{lastActionTimeText}</Tooltip>    
+            {:catch error}
+              <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
+                <Avatar
+                  src='/img/defaultavator.png'
+                  size="xl"
+                  dot={{ color: lastActionTimeColor, size: 'xl' }}
+                />
+              </a>
+            {/await}
           </div>
           <h5 class="mt-2">Recent Friends:</h5>
           <div class="flex items-center justify-center gap-1 ">
             {#if recentFriends.length > 0}
-              {#each recentFriends.slice(0, 3) as friend, i}
-                <Avatar src={friend.img} size="sm" />
-                <Tooltip>{friend.name}</Tooltip>
+              {#each recentFriends as friend}
+                {#await friend.img then imgFriend}
+                  <Avatar src={imgFriend} size="sm" />
+                  <Tooltip>{friend.name}</Tooltip>
+                {:catch error}
+                  <Avatar src='/img/defaultavator.png' size="sm" />
+                  <Tooltip>{friend.name}</Tooltip>
+                {/await}
               {/each}
             {:else}
               <h5 class="font-bold text-center leading-tight">
@@ -159,7 +182,7 @@
           </Button>
         </div>
         <!-- タイムライン欄 -->
-        <div class="flex-col w-100 ml-2">
+        <div class="flex-col w-96 ml-2">
           <h5 class="mb-4">Activity Timeline:</h5>
           <ActiveHistgram {tappedNode}/>
         </div>

@@ -11,10 +11,7 @@ export default [
       'text-valign': 'center',
       'text-wrap': 'wrap',
       'text-max-width': '140',
-      'background-color': 'gold',
-      'border-color': 'orange',
-      'border-width': '3',
-      'color': 'darkred'
+      'background-color': 'gray',
     }
   },
   {
@@ -43,8 +40,7 @@ export default [
     selector: 'node:selected',
     style: {
       'background-color': 'darkred',
-      // 'content': `data(name)`,
-      color: 'white',
+      'color': 'white',
       'border-color': 'darkred',
       'line-color': '#0e76ba',
       'target-arrow-color': '#0e76ba'
@@ -53,19 +49,19 @@ export default [
   {
     selector: 'node.todirect',
     style: {
-      'background-color': 'blue',
+      'background-color': 'lightblue',
     }
   },
   {
     selector: 'node.fromdirect',
     style: {
-      'background-color': 'green',
+      'background-color': 'lightblue',
     }
   },
   {
     selector: 'node.bidirect',
     style: {
-      'background-color': 'lightblue',
+      'background-color': 'blue',
     }
   },
   {

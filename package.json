@@ -34,6 +34,7 @@
 		"cytoscape-fcose": "^2.2.0",
 		"flowbite": "^2.5.1",
 		"flowbite-svelte": "^0.46.16",
-		"flowbite-svelte-icons": "^1.6.1"
+		"flowbite-svelte-icons": "^1.6.1",
+		"mime-types": "^2.1.35"
 	}
 }
