@@ -20,7 +20,7 @@
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    // ローカルストレージからセット
+    // ローカルストレージからハンドル名セット
     const storedHandle = localStorage.getItem('handle');
     if (storedHandle) {
       inputHandle = storedHandle;
@@ -108,8 +108,8 @@
     {#if (tappedNode && tappedNode.data('name'))}
       <div class="flex items-center overflow-x-scroll overflow-y-hidden whitespace-nowrap hide-scrollbar">
         <!-- アバター欄 -->
-        <div class="flex-col mr-2">
-          <div>
+        <div class="flex-col mr-2 w-36 flex-shrink-0">
+          <div class="w-36 h-36 flex-shrink-0">
             {#await promiseImgTappedNode then imgUrl}
               <a href={`https://bsky.app/profile/${tappedNode.data('handle')}`} target="_blank" rel="noopener noreferrer">
                 <Avatar
@@ -130,7 +130,7 @@
             {/await}
           </div>
           <h5 class="mt-2">Recent Friends:</h5>
-          <div class="flex items-center justify-center gap-1 ">
+          <div class="flex items-center justify-center gap-2 h-8">
             {#if recentFriends.length > 0}
               {#each recentFriends as friend}
                 {#await friend.img then imgFriend}

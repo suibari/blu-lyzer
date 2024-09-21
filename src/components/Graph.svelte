@@ -12,10 +12,12 @@
   export let tappedNode = null;
   // export let inputHandle = "";
   export let recentFriends = [];
+  export let isRunning = false;
 
   let container;
   let cyInstance = null;
   let concatElements = [];
+  let currentElements = [];
 
   if (PUBLIC_NODE_ENV === 'production') {
     cytoscape.warnings(false);
@@ -47,13 +49,27 @@
       cyInstance
         .layout(GraphLayout)
         .run()
+      
+      currentElements = cyInstance.elements().jsons(); // 現在のelementsをここで取っておかないとうまくいかない
+      isRunning = false;
     });
 
-    // カード表示
+    // ノードタップ検出
     cyInstance.on('tap', 'node', (evt) => {
+      // 各種初期化
       recentFriends = []; // ここで初期化しないと表示がおかしくなる
+      cyInstance.nodes().removeClass('todirect fromdirect bidirect');
+
       tappedNode = evt.target;
       console.log(tappedNode.data());
+    });
+
+    // 背景タップ検出
+    cyInstance.on('tap', function(event) {
+      if (event.target === cyInstance) { // 背景がクリックされた場合
+        cyInstance.nodes().removeClass('todirect fromdirect bidirect');
+        tappedNode = null;
+      }
     });
 
     // ズームでコンパウンドノード文字サイズ変更
@@ -76,13 +92,27 @@
   $: if (cyInstance) {
     // 現在のelementsが新しく追加される要素と異なる場合のみ追加処理を行う
     if (elements.length > 0) {
-      const currentElements = cyInstance.elements();
-      const currentElementsId = currentElements.map(e => e.id());
-      const newElements = elements.filter(e => !currentElementsId.includes(e.data.id));
+      const currentNodes = currentElements.filter(e => e.group === 'nodes').map(e => e.data.id); // ノードのidを取得
+      const currentEdges = currentElements.filter(e => e.group === 'edges').map(e => ({ source: e.data.source, target: e.data.target })); // エッジのsourceとtargetを取得
+      
+      const newNodes = elements.filter(e => {
+        if (e.group === 'nodes') {
+          return !currentNodes.includes(e.data.id);
+        } else {
+          return false;
+        }
+      });
+      const newEdges = elements.filter(e => {
+        if (e.group === 'edges') {
+          return !currentEdges.some(edge => edge.source === e.data.source && edge.target === e.data.target);
+        } else {
+          return false;
+        }
+      });
 
-      if (newElements.length > 0) {
+      if (newNodes.length > 0) {
         // 旧elementsと新elementsを結合し、再グルーピング
-        concatElements = groupElementsWithCompoundNodes(currentElements.concat(newElements));
+        concatElements = groupElementsWithCompoundNodes(currentElements.concat(newNodes).concat(newEdges));
         
         // グルーピングで余ったコンパウンドノードを削除
         removeInvalidNodesAndEdges(concatElements);
@@ -94,6 +124,8 @@
         console.log('adding elements...');
         cyInstance.add(concatElements);
         console.log('added elements!');
+      } else {
+        isRunning = false;
       }
     }
   }
@@ -146,9 +178,6 @@
   }
 
   function updateConnectedNodeStyles() {
-    // すべてのノードのスタイルをリセット
-    cyInstance.nodes().removeClass('todirect fromdirect bidirect');
-
     // 選択されたノードから出るエッジと入るエッジを取得
     const outgoingEdges = tappedNode.outgoers('edge');
     const incomingEdges = tappedNode.incomers('edge');

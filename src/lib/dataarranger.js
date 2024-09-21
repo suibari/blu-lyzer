@@ -42,6 +42,9 @@ export function removeInvalidNodesAndEdges(elements) {
     }
   });
 
+  console.log(nodeIds.has("did:plc:ipj5qejfoqu6eukvt72uhyit"));
+  console.log(nodeIds.has("did:plc:ilxxgyz7oz7mysber4omeqrg"));
+
   // 有効なエッジと接続されているノードを抽出する
   elements.forEach(element => {
     if (element.group === 'edges' && element.data && element.data.source && element.data.target) {
@@ -50,6 +53,10 @@ export function removeInvalidNodesAndEdges(elements) {
         validEdges.push(element); // 有効なエッジを配列に追加
         connectedNodes.add(element.data.source); // 接続されているノードのIDを追加
         connectedNodes.add(element.data.target); // 接続されているノードのIDを追加
+      } else {
+        if ((element.data.source === "did:plc:ipj5qejfoqu6eukvt72uhyit") && (element.data.target === "did:plc:ilxxgyz7oz7mysber4omeqrg")) {
+          console.log(element)
+        }
       }
     }
   });
