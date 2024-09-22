@@ -196,7 +196,7 @@
           placeholder="handle.bsky.social"
           class="w-2/3"
         />
-        <Button class="w-100 h-10 ml-2 mt-2" on:click={() => dispatch('expandGraph', {handle: inputHandle, setStrage: true})}>
+        <Button class="w-100 h-10 ml-2 mt-2" on:click={() => dispatch('expandGraph', {handle: inputHandle, setStrage: true, isCreateGraph: true})}>
           Create New Graph!
           <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
         </Button>

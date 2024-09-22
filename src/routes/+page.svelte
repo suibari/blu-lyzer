@@ -68,6 +68,12 @@
     if (detail.setStrage) {
       localStorage.setItem('handle', detail.handle);
     }
+
+    if (detail.isCreateGraph) {
+      gtag('event', 'create_graph');
+    } else {
+      gtag('event', 'expand_graph');
+    }
   }
 </script>
 

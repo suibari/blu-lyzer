@@ -65,7 +65,9 @@
       cyInstance.nodes().removeClass('todirect fromdirect bidirect');
 
       tappedNode = evt.target;
-      console.log(tappedNode.data());
+      // console.log(tappedNode.data());
+
+      gtag('event', 'tap_node');
     });
 
     // 背景タップ検出
@@ -126,11 +128,13 @@
         setRandomColorsForCompoundElements(concatElements);
 
         // 描画
-        console.log('adding elements...');
+        // console.log('adding elements...');
         cyInstance.add(concatElements);
-        console.log('added elements!');
+        // console.log('added elements!');
+        
+        gtag('event', 'elements_amounts', {value: elements.length});
       } else {
-        messageInfoAlert = 'Cannot expand graph because no expandable data was found in "Hirogaru-Bluesky!".';
+        messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
         showInfoAlert = true;
         isRunning = false;
       }

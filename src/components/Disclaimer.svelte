@@ -2,6 +2,10 @@
 	import { Button, Modal } from 'flowbite-svelte';
 
   export let isOpenDisclaimer = false;
+
+	$: if (isOpenDisclaimer) {
+    gtag('event', 'open_disclaimer');
+  }
 </script>
 
 <Modal title="免責事項" bind:open={isOpenDisclaimer} autoclose outsideclose>

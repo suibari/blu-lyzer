@@ -2,6 +2,10 @@
 	import { Button, Modal } from 'flowbite-svelte';
 
   export let isOpenQA = false;
+
+  $: if (isOpenQA) {
+    gtag('event', 'open_qa');
+  }
 </script>
 
 <Modal title="よくある質問" bind:open={isOpenQA} autoclose outsideclose>

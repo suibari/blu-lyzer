@@ -2,6 +2,10 @@
 	import { Button, Modal } from 'flowbite-svelte';
 
   export let isOpenLicense = false;
+
+  $: if (isOpenLicense) {
+    gtag('event', 'open_license');
+  }
 </script>
 
 <Modal title="ライセンス" bind:open={isOpenLicense} autoclose outsideclose>

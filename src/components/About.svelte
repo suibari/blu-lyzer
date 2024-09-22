@@ -3,6 +3,10 @@
 	import { Button, Modal } from 'flowbite-svelte';
 
   export let isOpenAbout = false;
+	
+	$: if (isOpenAbout) {
+    gtag('event', 'open_about');
+  }
 </script>
 
 <Modal title="本サービスについて" bind:open={isOpenAbout} autoclose outsideclose>
