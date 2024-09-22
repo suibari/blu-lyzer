@@ -7,6 +7,7 @@ export async function POST({ request }) {
 
   const elements = await getData(handle);
 
+  console.log(`[INFO] send elements object: ${elements.length}`);
   return new Response(JSON.stringify({ elements }), {
     headers: { 'Content-Type': 'application/json' }
   });

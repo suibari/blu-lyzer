@@ -54,7 +54,6 @@
         .layout(GraphLayout)
         .run()
       
-      currentElements = cyInstance.elements().jsons(); // 現在のelementsをここで取っておかないとうまくいかない
       isRunning = false;
     });
 
@@ -95,49 +94,60 @@
     })
   })
 
-  // elementsが変化したときのメインのリアクティブ処理
-  $: if (cyInstance) {
-    // 現在のelementsが新しく追加される要素と異なる場合のみ追加処理を行う
-    if (elements.length > 0) {
-      const currentNodes = currentElements.filter(e => e.group === 'nodes').map(e => e.data.id); // ノードのidを取得
-      const currentEdges = currentElements.filter(e => e.group === 'edges').map(e => ({ source: e.data.source, target: e.data.target })); // エッジのsourceとtargetを取得
+  // elementsが変化したときのメインの処理
+  export function updateElementsOnGraph(newElements) {
+    const currentNodes = currentElements.filter(e => e.group === 'nodes').map(e => e.data.id); // ノードのidを取得
+    const currentEdges = currentElements.filter(e => e.group === 'edges').map(e => ({ source: e.data.source, target: e.data.target })); // エッジのsourceとtargetを取得
+    
+    const newNodes = newElements.filter(e => {
+      if (e.group === 'nodes') {
+        return !currentNodes.includes(e.data.id);
+      } else {
+        return false;
+      }
+    });
+    const newEdges = newElements.filter(e => {
+      if (e.group === 'edges') {
+        return !currentEdges.some(edge => edge.source === e.data.source && edge.target === e.data.target);
+      } else {
+        return false;
+      }
+    });
+    // console.log(newNodes);
+    // console.log(newEdges);
+
+    if (newNodes.length > 0) {
+      // 旧elementsと新elementsを結合し、再グルーピング
+      concatElements = groupElementsWithCompoundNodes(currentElements.concat(newNodes).concat(newEdges));
       
-      const newNodes = elements.filter(e => {
-        if (e.group === 'nodes') {
-          return !currentNodes.includes(e.data.id);
-        } else {
-          return false;
-        }
-      });
-      const newEdges = elements.filter(e => {
-        if (e.group === 'edges') {
-          return !currentEdges.some(edge => edge.source === e.data.source && edge.target === e.data.target);
-        } else {
-          return false;
-        }
-      });
+      // グルーピングで余ったコンパウンドノード、未接続ノード、未接続エッジを削除
+      removeInvalidNodesAndEdges(concatElements);
 
-      if (newNodes.length > 0) {
-        // 旧elementsと新elementsを結合し、再グルーピング
-        concatElements = groupElementsWithCompoundNodes(currentElements.concat(newNodes).concat(newEdges));
-        
-        // グルーピングで余ったコンパウンドノード、未接続ノード、未接続エッジを削除
-        removeInvalidNodesAndEdges(concatElements);
-        
-        // コンパウンドノードへのランダムカラー設定
-        setRandomColorsForCompoundElements(concatElements);
+      // コンパウンドノードへのランダムカラー設定
+      setRandomColorsForCompoundElements(concatElements);
 
+      // console.log(currentElements.length);
+      // console.log(concatElements.length);
+
+      // ノードコンパウンド後の最終チェック
+      if ((currentElements.length > 0) && (currentElements.length >= concatElements.length)) {
+        messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
+        showInfoAlert = true;
+        isRunning = false;
+      } else {
         // 描画
         // console.log('adding elements...');
         cyInstance.add(concatElements);
         // console.log('added elements!');
         
-        gtag('event', 'elements_amounts', {value: elements.length});
-      } else {
-        messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
-        showInfoAlert = true;
-        isRunning = false;
+        currentElements = cyInstance.elements().jsons(); // 現在のelementsをここで取っておく
+
+        gtag('event', 'elements_amounts', {value: concatElements.length});
       }
+    } else {
+      messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
+      showInfoAlert = true;
+      isRunning = false;
     }
   }
 
@@ -167,7 +177,7 @@
 
     if (friends && friends.length > 0) {
       for (const friend of friends) {
-        const match = elements.find(element => element.data.id === friend.did);
+        const match = currentElements.find(element => element.data.id === friend.did);
         const isMyself = (tappedNode.data('id') === friend.did);
         if (match && !isMyself) {
           const img = getProxyUrlForImage(match.data.img);
