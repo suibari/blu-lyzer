@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   // flowbite-svelte
   import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
@@ -23,6 +24,11 @@
   let isAnalyzed = false;
   let isOpenAbout, isOpenQA, isOpenDisclaimer, isOpenLicense = false;
   let isVisible = true;
+  let isNallowWindow = false;
+
+  onMount(() => {
+    isNallowWindow = window.matchMedia("(max-width: 600px)").matches;
+  })
 
   async function expandGraph(event) {
     const detail = event.detail;
@@ -77,22 +83,32 @@
   }
 </script>
 
-<Navbar class="w-full bg-primary-900 text-white">
-  <NavBrand href="/">
-    <span class="font-orbitron text-xl text-white">Blu-lyzer</span>
-  </NavBrand>
-  <NavHamburger />
-  <NavUl>
-    <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
-    <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
-    <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
-    <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
-  </NavUl>
-</Navbar>
-
 <Title
   {isVisible}
 />
+
+<Navbar class="fixed top-0 left-0 w-full bg-primary-900 text-white z-50">
+  <NavBrand href="/">
+    <span class="font-orbitron text-xl text-white">Blu-lyzer</span>
+  </NavBrand>
+  <NavHamburger/>
+  {#if !isNallowWindow}
+    <NavUl>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
+    </NavUl>
+  {:else}
+    <NavUl ulClass="bg-primary-900 border-0" activeClass="bg-primary-900" nonActiveClass="bg-primary-900">
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
+    </NavUl>
+  {/if}
+  
+</Navbar>
 
 <div class="z-1">
   <Graph
