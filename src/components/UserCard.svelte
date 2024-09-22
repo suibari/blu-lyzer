@@ -62,9 +62,9 @@
     const diffInDays = Math.floor(diffInMilliseconds / (60000 * 60 * 24));
     const diffInMonths = Math.floor(diffInDays / 30); // おおよそ1ヶ月を30日とする
 
-    if (diffInMinutes < 60) {
+    if (diffInHours < 24) {
       return 'green';
-    } else if (diffInHours < 24) {
+    } else if (diffInDays < 7) {
       return 'yellow';
     } else if (diffInDays < 30) {
       return 'red';
@@ -149,7 +149,7 @@
           </div>
         </div>
         <!-- テキスト欄 -->
-        <div class="flex flex-col w-96 ml-4">
+        <div class="flex flex-col w-1/2 ml-4 flex-shrink-0">
           <div class="flex items-end">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
               {tappedNode.data('name')}
@@ -212,7 +212,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    max-width: 800px;
+    max-width: 820px;
     margin-left: auto;
     margin-right: auto;
   }

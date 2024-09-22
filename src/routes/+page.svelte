@@ -13,6 +13,7 @@
 	import Disclaimer from '../components/Disclaimer.svelte';
 	import License from '../components/License.svelte';
 	import Title from '../components/Title.svelte';
+	import ChangeLog from '../components/ChangeLog.svelte';
 
   let elements = [];
   let tappedNode = null;
@@ -22,9 +23,10 @@
   let messageErrorAlert = "";
   let analyzedHandleArray = [];
   let isAnalyzed = false;
-  let isOpenAbout, isOpenQA, isOpenDisclaimer, isOpenLicense = false;
+  let isOpenAbout, isOpenQA, isOpenDisclaimer, isOpenChangeLog, isOpenLicense = false;
   let isVisible = true;
   let isNallowWindow = false;
+  let updateElementsOnGraph; // Graphの子関数
 
   onMount(() => {
     isNallowWindow = window.matchMedia("(max-width: 600px)").matches;
@@ -66,7 +68,8 @@
 
     // 成功: 1件以上の相関図データが取得
     const result = await response.json();
-    elements = result.elements;
+    updateElementsOnGraph(result.elements);
+    // elements = result.elements;
     // console.log(elements);
 
     analyzedHandleArray.push(detail.handle);
@@ -87,7 +90,7 @@
   {isVisible}
 />
 
-<Navbar class="fixed top-0 left-0 w-full bg-primary-900 text-white z-50">
+<Navbar class="fixed top-0 left-0 w-full bg-primary-900 text-white z-10">
   <NavBrand href="/">
     <span class="font-orbitron text-xl text-white">Blu-lyzer</span>
   </NavBrand>
@@ -97,13 +100,14 @@
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenChangeLog = true}>ChangeLog</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
     </NavUl>
   {:else}
     <NavUl ulClass="bg-primary-900 border-0" activeClass="bg-primary-900" nonActiveClass="bg-primary-900">
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
-      <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenChangeLog = true}>ChangeLog</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
     </NavUl>
   {/if}
@@ -112,7 +116,7 @@
 
 <div class="z-1">
   <Graph
-    {elements}
+    bind:updateElementsOnGraph
     bind:isRunning
     bind:tappedNode
     bind:recentFriends
@@ -146,6 +150,10 @@
 
 <Disclaimer
   bind:isOpenDisclaimer
+/>
+
+<ChangeLog
+  bind:isOpenChangeLog
 />
 
 <License

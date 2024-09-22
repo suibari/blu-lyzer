@@ -94,10 +94,12 @@ export default {
   gravity: 0.25,
 
   // コンパウンドのための重力範囲（定数）
-  gravityRangeCompound: 1.5,
+  // gravityRangeCompound: 1.5,
+  gravityRangeCompound: 1.0,
 
   // コンパウンドのための重力の力（定数）
-  gravityCompound: 1.0,
+  // gravityCompound: 1.0,
+  gravityCompound: 2.0,
 
   // 重力範囲（定数）
   gravityRange: 3.8,
