@@ -1,9 +1,10 @@
 <script>
   import { Drawer, Button, CloseButton } from 'flowbite-svelte';
+  import { Spinner } from 'flowbite-svelte';
   import { FireOutline, ArrowRightOutline } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
 
-  export let isRunning = false;
+  let isRunning = false;
   let isTrendsHidden = true;
   let transitionParams = {
     x: -320,
@@ -46,7 +47,7 @@
 </script>
 
 <!-- タブ型ボタン -->
-<div class="fixed top-1/2 left-0 transform -translate-y-1/2 z-5">
+<div class="fixed top-3/4 left-0 transform -translate-y-1/2 z-5">
   <button 
     class="bg-primary-800 text-white px-2 py-4 rounded-r-lg origin-left" 
     on:click={() => handleTrends()}
@@ -58,10 +59,10 @@
 
 <!-- Drawer (左から展開するフレーム) -->
 <Drawer bind:hidden={isTrendsHidden} {transitionParams} placement="left" transitionType="fly" id="trendBar">
-  <div class="p-4">
+  <div class="p-4 relative">
     <div class="flex items-center">
       <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-        <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in Blu-lyzer
+        <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in<br>Blu-lyzer's Users
       </h5>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
@@ -75,4 +76,9 @@
       {/each}    
     </div>
   </div>
+  {#if isRunning}
+    <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
+      <Spinner size={16} />
+    </div>
+  {/if}
 </Drawer>
