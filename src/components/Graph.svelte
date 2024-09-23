@@ -64,7 +64,7 @@
       cyInstance.nodes().removeClass('todirect fromdirect bidirect');
 
       tappedNode = evt.target;
-      // console.log(tappedNode.data());
+      console.log(tappedNode.data());
 
       gtag('event', 'tap_node');
     });

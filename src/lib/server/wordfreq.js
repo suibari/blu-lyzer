@@ -56,12 +56,10 @@ export async function getNounFrequencies(posts, sliceNum) {
         });
       });
 
-      const sortedNouns = Object.entries(freqMap)
-        .sort((a, b) => b[1] - a[1])
-        // .slice(0, sliceNum)
-        .map(([noun]) => noun);
-
-      resolve(sortedNouns);
+      const sortedData = Object.entries(freqMap).sort((a, b) => b[1] - a[1]); // スコアでソート
+      const sortedNouns = sortedData.map(([noun]) => noun).slice(0, 3); // 名詞の配列TOP3
+      
+      resolve({ sortedNouns, sortedData });
     });
   });
 }

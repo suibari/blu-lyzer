@@ -9,6 +9,7 @@
 	import ActiveHistgram from './ActiveHistgram.svelte';
   // js
   import { getProxyUrlForImage } from '$lib/imgfetch';
+	import { slide } from 'svelte/transition';
   
   export let tappedNode = null;
   export let recentFriends = [];
@@ -171,9 +172,13 @@
             <div class="flex">
               <div class="flex items-end mb-2">
                 <h5>Recent Boom:</h5>
-                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">#{tappedNode.data('wordFreqMap')[0]}</h3>
-                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">#{tappedNode.data('wordFreqMap')[1]}</h3>
-                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{tappedNode.data('wordFreqMap')[2]}</h3>
+                  {#if tappedNode.data('wordFreqMap').length > 0}
+                    {#each tappedNode.data('wordFreqMap').slice(0, 3) as word, i}
+                      <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word}</h3>
+                    {/each}
+                  {:else}
+                    <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">No Data</h3>
+                  {/if}
               </div>
             </div>
           </div>
