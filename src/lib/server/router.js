@@ -1,6 +1,7 @@
+
 import { supabase } from "./supabase";
-import { setInvolvedEngagements } from "./databuilder";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
+import { inngest } from "$lib/inngest";
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
@@ -57,9 +58,7 @@ export async function getData(handle) {
             node.data.averageInterval = match.result_analyze.averageInterval;
             node.data.lastActionTime = match.result_analyze.lastActionTime;
             node.data.wordFreqMap = match.result_analyze.wordFreqMap;
-
-            // 最近の仲良し追加
-            setInvolvedEngagements(node, match.records.posts, match.records.likes, SCORE_REPLY, SCORE_LIKE);
+            node.data.recentFriends = match.result_analyze.recentFriends;
           }
           
           // 進捗をiに応じて加算
@@ -69,8 +68,11 @@ export async function getData(handle) {
       }
 
       // const elementsCompound = groupElementsWithCompoundNodes(elementsFiltered);
-
       // removeInvalidNodesAndEdges(elementsCompound);
+
+      // inngestイベント駆動
+      await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G0', data: { handle } });
+      await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G1', data: { handle } });
 
       return elementsFiltered;
     } else {

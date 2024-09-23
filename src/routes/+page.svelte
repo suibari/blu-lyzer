@@ -107,6 +107,7 @@
     <NavUl ulClass="bg-primary-900 border-0" activeClass="bg-primary-900" nonActiveClass="bg-primary-900">
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenAbout = true}>About</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenQA = true}>Q&A</NavLi>
+      <NavLi class="text-white cursor-pointer" on:click={() => isOpenDisclaimer = true}>Disclaimer</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenChangeLog = true}>ChangeLog</NavLi>
       <NavLi class="text-white cursor-pointer" on:click={() => isOpenLicense = true}>LICENSE</NavLi>
     </NavUl>

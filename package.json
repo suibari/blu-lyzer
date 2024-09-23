@@ -30,11 +30,15 @@
 	"type": "module",
 	"dependencies": {
 		"@supabase/supabase-js": "^2.45.4",
+		"blueskyer": "^1.2.6",
 		"cytoscape": "^3.30.2",
 		"cytoscape-fcose": "^2.2.0",
 		"flowbite": "^2.5.1",
 		"flowbite-svelte": "^0.46.16",
 		"flowbite-svelte-icons": "^1.6.1",
-		"mime-types": "^2.1.35"
+		"inngest": "^3.22.13",
+		"kuromoji": "^0.1.2",
+		"mime-types": "^2.1.35",
+		"undici": "^6.19.8"
 	}
 }
