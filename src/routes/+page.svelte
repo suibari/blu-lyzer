@@ -14,6 +14,7 @@
 	import License from '../components/License.svelte';
 	import Title from '../components/Title.svelte';
 	import ChangeLog from '../components/ChangeLog.svelte';
+	import Trends from '../components/Trends.svelte';
 
   let elements = [];
   let tappedNode = null;
@@ -124,8 +125,12 @@
   />
 </div>
 
+<Trends
+  bind:isRunning
+/>
+
 {#if isRunning}
-  <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-5">
+  <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-40">
     <Spinner size={16} />
   </div>
 {/if}

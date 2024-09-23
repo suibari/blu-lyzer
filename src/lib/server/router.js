@@ -3,6 +3,7 @@ import { PUBLIC_NODE_ENV } from '$env/static/public'
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { inngest } from "$lib/inngest";
+import { getTrend } from './trend';
 
 const SCORE_REPLY = 10;
 const SCORE_LIKE = 1;
