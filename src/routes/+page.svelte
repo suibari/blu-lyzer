@@ -15,6 +15,7 @@
 	import Title from '../components/Title.svelte';
 	import ChangeLog from '../components/ChangeLog.svelte';
 	import Trends from '../components/Trends.svelte';
+	import Ranking from '../components/Ranking.svelte';
 
   let elements = [];
   let tappedNode = null;
@@ -126,6 +127,8 @@
 </div>
 
 <Trends/>
+
+<Ranking/>
 
 {#if isRunning}
   <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-40">

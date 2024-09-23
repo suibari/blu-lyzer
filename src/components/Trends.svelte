@@ -47,7 +47,7 @@
 </script>
 
 <!-- タブ型ボタン -->
-<div class="fixed top-3/4 left-0 transform -translate-y-1/2 z-5">
+<div class="fixed top-2/3 left-0 transform -translate-y-1/2 z-5">
   <button 
     class="bg-primary-800 text-white px-2 py-4 rounded-r-lg origin-left" 
     on:click={() => handleTrends()}
