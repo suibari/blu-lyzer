@@ -1,4 +1,5 @@
 
+import { PUBLIC_NODE_ENV } from '$env/static/public'
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { inngest } from "$lib/inngest";
@@ -72,7 +73,9 @@ export async function getData(handle) {
 
       // inngestイベント駆動
       await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G0', data: { handle } });
-      await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G1', data: { handle } });
+      if (PUBLIC_NODE_ENV === 'production') { // ローカルだとメモリ不足で実行できない場合があるので
+        await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G1', data: { handle } });
+      }
 
       return elementsFiltered;
     } else {

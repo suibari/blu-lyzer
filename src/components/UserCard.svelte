@@ -149,9 +149,9 @@
           </div>
         </div>
         <!-- テキスト欄 -->
-        <div class="flex flex-col w-1/2 ml-4 flex-shrink-0">
+        <div class="flex flex-col w-96 ml-4 flex-shrink-0">
           <div class="flex items-end">
-            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
               {tappedNode.data('name')}
             </h5>
             <h5 class="mb-2 ml-2 text-xl font-bold tracking-tight truncate">
