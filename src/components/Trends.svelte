@@ -1,6 +1,6 @@
 <script>
   import { Drawer, Button, CloseButton } from 'flowbite-svelte';
-  import { InfoCircleSolid, ArrowRightOutline } from 'flowbite-svelte-icons';
+  import { FireOutline, ArrowRightOutline } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
 
   export let isRunning = false;
@@ -33,6 +33,16 @@
 
     isRunning = false;
   }
+
+  function getClass(index) {
+    if (index < 10) {
+      return 'text-xl'; // 2位〜10位
+    } else if (index >= 10 && index < 50) {
+      return 'text-base'; // 11位〜50位
+    } else {
+      return 'text-sm'; // それ以降
+    }
+  }
 </script>
 
 <!-- タブ型ボタン -->
@@ -49,15 +59,20 @@
 <!-- Drawer (左から展開するフレーム) -->
 <Drawer bind:hidden={isTrendsHidden} {transitionParams} placement="left" transitionType="fly" id="trendBar">
   <div class="p-4">
-    <h2 class="text-lg font-bold">Trends in Blu-lyzer</h2>
+    <div class="flex items-center">
+      <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+        <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in Blu-lyzer
+      </h5>
+      <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
+    </div>
     <div class="mt-4 space-y-4">
       {#each trends as trend, i}
         <div class="flex">
-          <p class="w-1/4">{i+1}.</p>
-          <p class="w-2/4">{trend[0]}</p>
-          <p class="w-1/4 text-right">{trend[1]}</p>
+          <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
+          <p class={`w-2/4 ${getClass(i)}`}>{trend[0]}</p>
+          <p class={`w-1/4 text-right ${getClass(i)}`}>{trend[1]}</p>
         </div>
-      {/each}
+      {/each}    
     </div>
   </div>
 </Drawer>
