@@ -1,6 +1,7 @@
 
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
+import { getTrend } from './trend';
 
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1; // RADIUS_THRD_INC_USER 以下推奨
