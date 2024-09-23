@@ -125,9 +125,7 @@
   />
 </div>
 
-<Trends
-  bind:isRunning
-/>
+<Trends/>
 
 {#if isRunning}
   <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-40">
