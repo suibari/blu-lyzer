@@ -64,7 +64,7 @@
       cyInstance.nodes().removeClass('todirect fromdirect bidirect');
 
       tappedNode = evt.target;
-      console.log(tappedNode.data());
+      // console.log(tappedNode.data());
 
       gtag('event', 'tap_node');
     });
@@ -95,7 +95,12 @@
   })
 
   // elementsが変化したときのメインの処理
-  export function updateElementsOnGraph(newElements) {
+  export function updateElementsOnGraph(newElements, isCreateGraph) {
+    // Create Graphボタンの場合削除
+    if (isCreateGraph) {
+      removeGraph();
+    }
+
     const currentNodes = currentElements.filter(e => e.group === 'nodes').map(e => e.data.id); // ノードのidを取得
     const currentEdges = currentElements.filter(e => e.group === 'edges').map(e => ({ source: e.data.source, target: e.data.target })); // エッジのsourceとtargetを取得
     
@@ -106,19 +111,11 @@
         return false;
       }
     });
-    const newEdges = newElements.filter(e => {
-      if (e.group === 'edges') {
-        return !currentEdges.some(edge => edge.source === e.data.source && edge.target === e.data.target);
-      } else {
-        return false;
-      }
-    });
     // console.log(newNodes);
-    // console.log(newEdges);
 
     if (newNodes.length > 0) {
       // 旧elementsと新elementsを結合し、再グルーピング
-      concatElements = groupElementsWithCompoundNodes(currentElements.concat(newNodes).concat(newEdges));
+      concatElements = groupElementsWithCompoundNodes(currentElements.concat(newElements));
       
       // グルーピングで余ったコンパウンドノード、未接続ノード、未接続エッジを削除
       removeInvalidNodesAndEdges(concatElements);
@@ -149,6 +146,10 @@
       showInfoAlert = true;
       isRunning = false;
     }
+  }
+
+  function removeGraph() {
+    cyInstance.remove(cyInstance.elements());
   }
 
   function setRandomColorsForCompoundElements(elements) {

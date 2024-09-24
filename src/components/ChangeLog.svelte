@@ -10,6 +10,8 @@
 
 <Modal title="よくある質問" bind:open={isOpenChangeLog} autoclose outsideclose>
 	<div>
+    <h1 class="text-xl font-bold mt-2">v0.0.4</h1>
+		<p>コンパウンドノードに含まれるノードが1つだった時に少なく表示されていたり、表示が行われなかったバグを修正</p>
     <h1 class="text-xl font-bold mt-2">v0.0.3</h1>
 		<p>分析機能を<a href="https://hirogaru-bluesky.vercel.app/" target="_blank">ひろがるBluesky!</a> から移管</p>
     <p>内部処理として、Blu-lyzerを実行するとバックグラウンドで分析データ更新が行われるようになりました</p>

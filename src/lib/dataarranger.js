@@ -138,6 +138,16 @@ export function groupElementsWithCompoundNodes(elements) {
           nodeToCompoundMap[childId] = compoundNodeId;
         }
       });
+    } else if (children.length === 1) {
+      // 子ノードが1つの場合、そのノードをそのまま保持
+      const childId = children[0];
+      if (!nodeToCompoundMap[childId]) {
+        const element = elements.find(el => el.data.id === childId);
+        compoundElements.push({
+          group: 'nodes',
+          data: { ...element.data, id: childId } // parent を設定しない
+        });
+      }
     }
   });
 

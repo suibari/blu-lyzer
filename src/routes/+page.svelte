@@ -68,7 +68,7 @@
 
     // 成功: 1件以上の相関図データが取得
     const result = await response.json();
-    updateElementsOnGraph(result.elements);
+    updateElementsOnGraph(result.elements, detail.isCreateGraph);
     // elements = result.elements;
     // console.log(elements);
 
