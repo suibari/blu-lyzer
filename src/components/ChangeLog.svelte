@@ -10,6 +10,8 @@
 
 <Modal title="よくある質問" bind:open={isOpenChangeLog} autoclose outsideclose>
 	<div>
+    <h1 class="text-xl font-bold mt-2">v0.0.5</h1>
+		<p>グラフ拡張時、子ノード1つのコンパウンドノードが残るバグ修正</p>
     <h1 class="text-xl font-bold mt-2">v0.0.4</h1>
 		<p>コンパウンドノードに含まれるノードが1つだった時に少なく表示されていたり、表示が行われなかったバグを修正</p>
     <h1 class="text-xl font-bold mt-2">v0.0.3</h1>

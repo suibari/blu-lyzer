@@ -95,15 +95,25 @@ export function groupElementsWithCompoundNodes(elements) {
   const compoundElements = [];
   const wordToChildrenMap = {};
   const nodeToCompoundMap = {};
+  const existingCompoundNodes = new Set(); // Track already compounded nodes
+  const childAssigned = new Set(); // Track child nodes that have already been assigned to a compound
 
   // expand時用に最初に重複ノード削除
   removeDuplicatesNodes(elements);
+
+  // 既存のコンパウンドノードをマップに追加
+  elements.forEach(element => {
+    if (element.data.parent) {
+      nodeToCompoundMap[element.data.id] = element.data.parent;
+      existingCompoundNodes.add(element.data.parent);
+    }
+  });
 
   // 各ノードを処理して、単語ごとに子ノードリストを作成
   elements.forEach(element => {
     const { wordFreqMap, id } = element.data;
 
-    if (wordFreqMap) {
+    if (wordFreqMap && !nodeToCompoundMap[id] && !childAssigned.has(id)) { // すでに親が設定されているノードや割り当て済みノードは無視
       wordFreqMap.forEach(word => {
         if (!wordToChildrenMap[word]) {
           wordToChildrenMap[word] = [];
@@ -120,33 +130,39 @@ export function groupElementsWithCompoundNodes(elements) {
     // 子ノードが 2 つ以上存在する場合のみコンパウンドノードを作成
     if (children.length >= 2) {
       const compoundNodeId = `group-${word}`;
-      
-      // コンパウンドノードの作成
-      compoundElements.push({
-        group: 'nodes',
-        data: { id: compoundNodeId, groupWord: word }
-      });
+
+      // 既存のコンパウンドノードをチェック
+      if (!existingCompoundNodes.has(compoundNodeId)) {
+        // コンパウンドノードの作成
+        compoundElements.push({
+          group: 'nodes',
+          data: { id: compoundNodeId, groupWord: word }
+        });
+        existingCompoundNodes.add(compoundNodeId);
+      }
 
       // 子ノードに親を設定してコンパウンドノードに含める
       children.forEach(childId => {
-        if (!nodeToCompoundMap[childId]) {
+        if (!nodeToCompoundMap[childId] && !childAssigned.has(childId)) {
           const element = elements.find(el => el.data.id === childId);
           compoundElements.push({
             group: 'nodes',
             data: { ...element.data, id: childId, parent: compoundNodeId },
           });
           nodeToCompoundMap[childId] = compoundNodeId;
+          childAssigned.add(childId); // 子ノードが他のコンパウンドノードに含まれないようにフラグを立てる
         }
       });
     } else if (children.length === 1) {
       // 子ノードが1つの場合、そのノードをそのまま保持
       const childId = children[0];
-      if (!nodeToCompoundMap[childId]) {
+      if (!nodeToCompoundMap[childId] && !childAssigned.has(childId)) {
         const element = elements.find(el => el.data.id === childId);
         compoundElements.push({
           group: 'nodes',
           data: { ...element.data, id: childId } // parent を設定しない
         });
+        childAssigned.add(childId); // フラグを立てる
       }
     }
   });

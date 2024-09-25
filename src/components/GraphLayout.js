@@ -102,7 +102,8 @@ export default {
   gravityCompound: 2.0,
 
   // 重力範囲（定数）
-  gravityRange: 3.8,
+  // gravityRange: 3.8,
+  gravityRange: 3.0,
 
   // 増分レイアウトの初期冷却係数
   initialEnergyOnIncremental: 0.3,
