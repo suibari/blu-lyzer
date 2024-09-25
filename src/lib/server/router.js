@@ -54,8 +54,7 @@ export async function getData(handle) {
             node.data.activeHistgram = match.result_analyze.activeHistgram;
             node.data.averageInterval = match.result_analyze.averageInterval;
             node.data.lastActionTime = match.result_analyze.lastActionTime;
-            node.data.wordFreqMap = match.result_analyze.wordFreqMap; // 使わないんだが、なぜかこの行がないと描画が止まる...
-            node.data.wordFreqFullMap = match.result_analyze.wordFreqFullMap.slice(0, 3);
+            node.data.wordFreqMap = match.result_analyze.wordFreqMap.slice(0, 3);
             node.data.recentFriends = match.result_analyze.recentFriends;
           }
           
