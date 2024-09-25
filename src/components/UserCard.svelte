@@ -18,6 +18,7 @@
   let lastActionTimeColor = "";
   let timeOnBskyText = "";
   let promiseImgTappedNode;
+  let averageSentimentScore;
   const dispatch = createEventDispatcher();
 
   onMount(() => {
@@ -102,6 +103,21 @@
       promiseImgTappedNode = getProxyUrlForImage(tappedNode.data('img'));
     }
   }
+
+  $: {
+    if (tappedNode && tappedNode.data('wordFreqMap')) {
+      const wordFreqMap = tappedNode.data('wordFreqMap');
+
+      const totalSentimentScore = wordFreqMap.reduce((sum, item) => {
+        return sum + (item.sentimentScore || 0); // sentimentScore が存在しない場合は 0 にする
+      }, 0);
+      const totalWordCount = wordFreqMap.reduce((sum, item) => {
+        return sum + (item.count || 0); // sentimentScore が存在しない場合は 0 にする
+      }, 0);
+
+      averageSentimentScore = wordFreqMap.length > 0 ? (totalSentimentScore / totalWordCount) : 0;
+    }
+  }
 </script>
 
 <div class="user-card">
@@ -150,7 +166,7 @@
           </div>
         </div>
         <!-- テキスト欄 -->
-        <div class="flex flex-col w-96 ml-4 flex-shrink-0">
+        <div class="flex flex-col w-108 ml-4 flex-shrink-0">
           <div class="flex items-end">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
               {tappedNode.data('name')}
@@ -164,10 +180,14 @@
                 <h5>Time on Bluesky:</h5>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{timeOnBskyText}d</h3>
               </div>
-              <div class="flex items-end mb-2">
-                <h5>Avg-Act. Interval:</h5>
+              <div class="flex items-center mb-2">
+                <h5 class="mr-2">Avg.</h5>
+                <h5 class="leading-none">Action<br>Interval</h5>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(tappedNode.data('averageInterval')/60)}</h3>
-                <h5 class="ml-1">[m/act]</h5>
+                <h5 class="ml-1 mr-4">[m/act]</h5>
+                <h5 class="leading-none">Setiment<br>Point</h5>
+                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(averageSentimentScore * 100 * 100) /100}</h3>
+                <h5 class="ml-1 mr-4">[/word]</h5>
               </div>
             <div class="flex">
               <div class="flex items-end mb-2">
@@ -187,7 +207,7 @@
           </Button>
         </div>
         <!-- タイムライン欄 -->
-        <div class="flex-col w-96 ml-2">
+        <div class="flex-col w-fit ml-2">
           <h5 class="mb-4">Activity Timeline:</h5>
           <ActiveHistgram {tappedNode}/>
         </div>
@@ -217,7 +237,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    max-width: 820px;
+    max-width: 900px;
     margin-left: auto;
     margin-right: auto;
   }

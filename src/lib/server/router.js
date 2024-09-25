@@ -55,7 +55,7 @@ export async function getData(handle) {
             node.data.activeHistgram = match.result_analyze.activeHistgram;
             node.data.averageInterval = match.result_analyze.averageInterval;
             node.data.lastActionTime = match.result_analyze.lastActionTime;
-            node.data.wordFreqMap = match.result_analyze.wordFreqMap.slice(0, 3);
+            node.data.wordFreqMap = match.result_analyze.wordFreqMap.sortedData;  // 臨時、あとでsortedDataは消す
             node.data.recentFriends = match.result_analyze.recentFriends;
           }
           
