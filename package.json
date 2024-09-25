@@ -36,7 +36,6 @@
 		"flowbite": "^2.5.1",
 		"flowbite-svelte": "^0.46.16",
 		"flowbite-svelte-icons": "^1.6.1",
-		"inngest": "^3.22.13",
 		"kuromoji": "^0.1.2",
 		"mime-types": "^2.1.35",
 		"undici": "^6.19.8"

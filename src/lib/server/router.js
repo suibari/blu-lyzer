@@ -1,11 +1,7 @@
 
-import { PUBLIC_NODE_ENV } from '$env/static/public'
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
-import { inngest } from "$lib/inngest";
 
-const SCORE_REPLY = 10;
-const SCORE_LIKE = 1;
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1; // RADIUS_THRD_INC_USER 以下推奨
 
@@ -71,12 +67,6 @@ export async function getData(handle) {
 
       // const elementsCompound = groupElementsWithCompoundNodes(elementsFiltered);
       // removeInvalidNodesAndEdges(elementsCompound);
-
-      // inngestイベント駆動
-      await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G0', data: { handle } });
-      if (PUBLIC_NODE_ENV === 'production') { // ローカルだとメモリ不足で実行できない場合があるので
-        await inngest.send({ name: 'hirogaru/updateDb.postsAndLikes.G1', data: { handle } });
-      }
 
       return elementsFiltered;
     } else {
