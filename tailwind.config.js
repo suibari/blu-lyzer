@@ -22,7 +22,7 @@ export default {
       },
       width: {
         '104': '26rem',
-      },
+      }
     }
   },
 
