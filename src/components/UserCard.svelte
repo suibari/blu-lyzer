@@ -174,7 +174,7 @@
                 <h5>Recent Boom:</h5>
                   {#if tappedNode.data('wordFreqFullMap')}
                     {#each tappedNode.data('wordFreqFullMap').slice(0, 3) as word, i}
-                      <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word.word}</h3>
+                      <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word[0]}</h3>
                     {/each}
                   {:else}
                     <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">No Data</h3>
