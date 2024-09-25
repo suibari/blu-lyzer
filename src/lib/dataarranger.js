@@ -115,10 +115,10 @@ export function groupElementsWithCompoundNodes(elements) {
 
     if (wordFreqMap && !nodeToCompoundMap[id] && !childAssigned.has(id)) { // すでに親が設定されているノードや割り当て済みノードは無視
       wordFreqMap.forEach(word => {
-        if (!wordToChildrenMap[word]) {
-          wordToChildrenMap[word] = [];
+        if (!wordToChildrenMap[word.noun]) {
+          wordToChildrenMap[word.noun] = [];
         }
-        wordToChildrenMap[word].push(id); // 子ノードリストに追加
+        wordToChildrenMap[word.noun].push(id); // 子ノードリストに追加
       });
     }
   });
