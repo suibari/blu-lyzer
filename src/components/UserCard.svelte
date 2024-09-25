@@ -172,9 +172,9 @@
             <div class="flex">
               <div class="flex items-end mb-2">
                 <h5>Recent Boom:</h5>
-                  {#if tappedNode.data('wordFreqMap').length > 0}
-                    {#each tappedNode.data('wordFreqMap').slice(0, 3) as word, i}
-                      <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word}</h3>
+                  {#if tappedNode.data('wordFreqFullMap')}
+                    {#each tappedNode.data('wordFreqFullMap').slice(0, 3) as word, i}
+                      <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word.word}</h3>
                     {/each}
                   {:else}
                     <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">No Data</h3>

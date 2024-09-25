@@ -7,8 +7,6 @@ const SCORE_LIKE = 1;
  * records.posts, records.likesをキーとして引数に入れ、解析結果を返す
  */
 export async function analyzeRecords(records) {
-  const WORDFREQ_SLICE_NUM = 3;
-
   let didReply = [];
   let didLike = [];
   let recentFriends = [];
@@ -51,9 +49,21 @@ export async function analyzeRecords(records) {
   result.lastActionTime = lastActionTime;
 
   // 頻出単語分析
-  const wordFreqMap = await getNounFrequencies(records.posts, WORDFREQ_SLICE_NUM);
+  const wordFreqMap = await getNounFrequencies(records.posts);
   result.wordFreqMap = wordFreqMap.sortedNouns;
   result.wordFreqFullMap = wordFreqMap.sortedData;
+  result.wordFreqFullMapToday = wordFreqMap.sortedDataToday;
+
+  // ポスト文字数分析
+  const totalTextLength = records.posts.reduce((total, post) => {
+    const text = post.value.text || ''; // textがundefinedの場合は空文字を代入
+    return total + text.length; // textの文字数を累積
+  }, 0);
+  if (records.posts.length > 0) {
+    result.averageTextLength = totalTextLength / (records.posts.length);
+  } else {
+    result.averageTextLength = null;
+  }
 
   // 最近の仲良し分析
   // リプライ

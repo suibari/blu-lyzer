@@ -1,6 +1,5 @@
 import { inngest } from './inngest';
-import { getElementsAndSetDb, getLatestPostsAndLikes } from '$lib/server/router';
-import { analyzeRecords } from '$lib/server/databuilder';
+import { analyzeRecords } from '$lib/server/analyze';
 import { TimeLogger } from '$lib/server/logger';
 import { supabase } from '$lib/server/supabase';
 import { MyBlueskyer } from '$lib/server/bluesky';
