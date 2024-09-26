@@ -195,3 +195,25 @@ export function groupElementsWithCompoundNodes(elements) {
   // フィルタリングされたノードとエッジを結合して返す
   return [...filteredCompoundElements, ...edges];
 }
+
+export function removeInvalidLinks(elements) {
+  const validEdges = []; // 有効なエッジを格納する配列
+  const validNodes = []; // 有効なノードを格納する配列
+
+  // 有効なエッジとノードを抽出する
+  elements.forEach(element => {
+    if (element.group === 'edges' && element.data && element.data.source && element.data.target) {
+      const sourceExists = elements.some(node => node.group === 'nodes' && node.data.id === element.data.source);
+      const targetExists = elements.some(node => node.group === 'nodes' && node.data.id === element.data.target);
+      if (sourceExists && targetExists) {
+        validEdges.push(element); // 有効なエッジを配列に追加
+      }
+    } else if (element.group === 'nodes') {
+      validNodes.push(element); // 有効なノードを配列に追加
+    }
+  });
+
+  // 元の配列を有効なエッジとノードの配列で置き換える
+  elements.length = 0;
+  elements.push(...validNodes, ...validEdges);
+}

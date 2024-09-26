@@ -1,0 +1,3 @@
+[submodule "src/lib/server/submodule"]
+	path = src/lib/server/submodule
+	url = https://github.com/suibari/blu-lyzer-cron.git
