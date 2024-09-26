@@ -78,16 +78,17 @@ export async function getData(handle) {
 
         const match = data.find(row => row.handle === node.data.handle);
         if (match) {
-          node.data.activeHistgram = match.result_analyze.activeHistgram;
-          node.data.averageInterval = match.result_analyze.averageInterval;
-          node.data.lastActionTime = match.result_analyze.lastActionTime;
-          node.data.wordFreqMap = match.result_analyze.wordFreqMap;
-          node.data.recentFriends = match.result_analyze.recentFriends;
+          node.data.activeHistgram = match.result_analyze.activeHistgram || null;
+          node.data.averageInterval = match.result_analyze.averageInterval || null;
+          node.data.lastActionTime = match.result_analyze.lastActionTime || null;
+          node.data.wordFreqMap = match.result_analyze.wordFreqMap || null;
+          node.data.recentFriends = match.result_analyze.recentFriends || null;
+          node.data.sentimentHeatmap = match.result_analyze.sentimentHeatmap || null;
         }
       }
     }
 
-    return elements;
+    return elementsFiltered;
 
   } catch (e) {
     throw e;
