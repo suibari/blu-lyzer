@@ -6,7 +6,7 @@
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
   // my components
-	import ActiveHistgram from './ActiveHistgram.svelte';
+  import CombinedGraph from './CombinedGraph.svelte';
   // js
   import { getProxyUrlForImage } from '$lib/imgfetch';
 	import { slide } from 'svelte/transition';
@@ -208,8 +208,8 @@
         </div>
         <!-- タイムライン欄 -->
         <div class="flex-col w-96 ml-2">
-          <h5 class="mb-4">Activity Timeline:</h5>
-          <ActiveHistgram {tappedNode}/>
+          <h5 class="mb-4 leading-5">Timeline with<br>Activity & Sentiment:</h5>
+          <CombinedGraph {tappedNode}/>
         </div>
       </div>
     {:else}
