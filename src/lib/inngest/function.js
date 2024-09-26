@@ -14,6 +14,9 @@ export const getElementsAndUpdateDbFunction = inngest.createFunction(
   { id: 'Update Database By Elements' },  // ワークフローの名前
   { event: 'blu-lyzer/updateDb.elements' },         // トリガーされるイベント名
   async ({ event }) => {
+    const timeLogger = new TimeLogger();
+    timeLogger.tic();
+
     const { handle } = event.data;
 
     console.log(`[INNGEST] ELEM: Executing update elements: ${handle}`);
@@ -26,6 +29,7 @@ export const getElementsAndUpdateDbFunction = inngest.createFunction(
       await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G0', data: { handle } });
       await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G1', data: { handle } });
 
+      console.log(`[INNGEST] ELEM: exec time was ${timeLogger.tac()} [sec]: ${handle}`);
       return { success: true };
     } catch (e) {
       console.error(`[INNGEST] ELEM: Failed to update DB for elements: ${handle}`, e);

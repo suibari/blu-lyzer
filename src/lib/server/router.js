@@ -20,18 +20,15 @@ export async function getData(handle) {
       .from('elements')
       .select('*')
       .filter('elements', 'cs', JSON.stringify([{ data: { handle: handle } }]));
-
     // 自分が含まれる相関図がないまたは前回実行から1時間以上経過していたら、inngestイベント駆動
-    const myData = data.find(element => element.handle === handle);
+    const myData = data.find(row => row.handle === handle);
     const currentTime = new Date();
-
     if (!myData) {
-      // myDataが見つからない（自分が含まれる相関図がない）場合の処理
+      // myDataが見つからない（自分の相関図がない）場合の処理
       await inngest.send({ name: 'blu-lyzer/updateDb.elements', data: { handle } });
     } else {
       const updatedAt = new Date(myData.updated_at);
       const timeDiff = currentTime - updatedAt;
-      
       // 1時間以上経過していたら
       if (timeDiff > ONE_HOUR_IN_MS) {
         await inngest.send({ name: 'blu-lyzer/updateDb.elements', data: { handle } });
