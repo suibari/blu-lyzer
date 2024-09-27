@@ -24,7 +24,7 @@ export async function getData(handle) {
     const myData = data.find(row => row.handle === handle);
     const currentTime = new Date();
     if (!myData) {
-      // myDataが見つからない（自分の相関図がない）場合の処理
+      // myDataが見つからない（自分が含まれる相関図がない）場合の処理
       await inngest.send({ name: 'blu-lyzer/updateDb.elements', data: { handle } });
     } else {
       const updatedAt = new Date(myData.updated_at);

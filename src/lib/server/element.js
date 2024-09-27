@@ -36,7 +36,7 @@ export async function getElementsAndSetDb(handle, threshold_tl, threshold_like, 
       }
 
       // 重複ノード削除: getElementsより先にやらないとnodesがTHRESHOLD_NODESより少なくなる
-      const allWithProf = agent.removeDuplicatesProfs(friendsWithProf.concat(myselfWithProf));
+      const allWithProf = agent.removeDuplicatesProfs([myselfWithProf].concat(friendsWithProf));
 
       // あまりに大きい相関図を送ると通信料がえげつないのでMAX_RADIUS段でクリップする
       const slicedAllWithProf = allWithProf.slice(0, 1 + 3 * (MAX_RADIUS - 1) * ((MAX_RADIUS - 1) + 1));
