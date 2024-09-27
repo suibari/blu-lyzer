@@ -1,3 +1,4 @@
+import { BSKY_IDENTIFIER, BSKY_APP_PASSWORD } from '$env/static/private';
 import { inngest } from './inngest';
 import { agent } from '../server/bluesky';
 import { getElementsAndSetDb } from '$lib/server/element';
@@ -86,6 +87,7 @@ export const analyzeRecordsFunction = inngest.createFunction(
   async ({event}) => {
     const { handle, records } = event.data;
 
+    await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
     const response = await agent.getProfile({actor: handle});
     const result = await analyzeRecords(records);
     const {data, error} = await supabase.from('records').upsert({
