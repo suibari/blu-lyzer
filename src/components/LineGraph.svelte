@@ -1,6 +1,7 @@
 <script>
   export let sentimentHeatmap = [];
 
+  let hours = Array.from({ length: 24 }, (_, i) => (i === 0 || i === 12 || i === 23) ? i : '');
   let linePoints = '';
 
   $: {
