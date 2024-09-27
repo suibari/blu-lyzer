@@ -4,7 +4,7 @@
   // flowbite-svelte
   import { Card, Button } from 'flowbite-svelte';
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
-  import { ArrowRightOutline } from 'flowbite-svelte-icons';
+  import { ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
   // my components
   import CombinedGraph from './CombinedGraph.svelte';
   // js
@@ -166,7 +166,7 @@
           </div>
         </div>
         <!-- テキスト欄 -->
-        <div class="flex flex-col w-96 ml-4 flex-shrink-0">
+        <div class="flex flex-col w-104 ml-4 flex-shrink-0">
           <div class="flex items-end">
             <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
               {tappedNode.data('name')}
@@ -178,20 +178,44 @@
           <div class="flex-col">
               <div class="flex items-end mb-2">
                 <h5>Time on Bluesky:</h5>
+                <span class="relative inline-block">
+                  <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+                  <Tooltip class="z-10 text-xs">
+                    ぶるすこ歴
+                  </Tooltip>
+                </span>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{timeOnBskyText}d</h3>
               </div>
               <div class="flex items-end mb-2">
                 <h5 class="mr-2">Avg.</h5>
-                <h5 class="leading-none">Action<br>Interval</h5>
+                <h5 class="leading-none">Action<br>Interval:</h5>
+                <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+                <Tooltip class="z-10 text-xs">
+                  平均活動間隔<br>
+                  ポストまたはいいねをした時間の間隔
+                </Tooltip>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(tappedNode.data('averageInterval')/60)}</h3>
                 <h5 class="ml-1 mr-4">[m/act]</h5>
-                <h5 class="leading-none">Setiment<br>Point</h5>
+                <h5 class="leading-none">Setiment<br>Point:</h5>
+                <span class="relative inline-block">
+                  <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+                  <Tooltip class="z-10 text-xs">
+                    平均感情値<br>
+                    ポストした1単語あたりのポジティブさ、ネガティブさ<br>
+                    目安として+10に近づけばポジティブ、<br>
+                    -10に近づけばネガティブと言えます
+                  </Tooltip>
+                </span>
                 <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(averageSentimentScore * 100 * 100) /100}</h3>
                 <h5 class="ml-1 mr-4">[/word]</h5>
               </div>
             <div class="flex">
               <div class="flex items-end mb-2">
                 <h5>Recent Boom:</h5>
+                  <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+                  <Tooltip class="z-10 text-xs">
+                    最近よく使う言葉
+                  </Tooltip>
                   {#if tappedNode.data('wordFreqMap')}
                     {#each tappedNode.data('wordFreqMap').slice(0, 3) as word, i}
                       <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">#{word.noun}</h3>
@@ -208,7 +232,19 @@
         </div>
         <!-- タイムライン欄 -->
         <div class="flex-col w-96 ml-2">
-          <h5 class="mb-4 leading-5">Timeline with<br>Activity & Sentiment:</h5>
+          <h5 class="mb-4 leading-5">
+            Timeline with<br>Activity & Sentiment:
+            <span class="relative inline-block">
+              <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+              <Tooltip class="z-10 text-xs">
+                活動と感情のタイムライン<br>
+                棒グラフはBluesky上で活発な時間帯を表します<br>
+                線グラフはグラフ中心をニュートラルとして<br>
+                上方向だとポジティブ、下方向だとネガティブな<br>
+                時間帯だったことを表します
+              </Tooltip>
+            </span>
+          </h5>
           <CombinedGraph {tappedNode}/>
         </div>
       </div>
@@ -237,7 +273,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    max-width: 820px;
+    max-width: 860px;
     margin-left: auto;
     margin-right: auto;
   }
