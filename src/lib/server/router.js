@@ -11,6 +11,8 @@ const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 
 export async function getData(handle) {
+  let radius_thrd = 0;
+  let filterdData = [];
   let elements = {};
 
   try {
@@ -38,31 +40,45 @@ export async function getData(handle) {
     if (data.length > 0) {
       // 相関図データがあるのでデータ整形を行う
       // フィルタリング1: 指定半径内に指定ユーザが入っているレコードのみ使う
-      const filterdData = data.filter(row => {
-        const elements = row.elements || [];
-
-        const isValidElement = elements.some(element => {
-          const dataLevel = element.data?.level;
-          const dataHandle = element.data?.handle;
-          return (dataLevel >= -RADIUS_THRD_INC_USER) && (dataHandle === handle);
+      //   filteredDataの要素数が10を超えるまで相関図半径を広げてサーチ。ただし半径4になったらそこで終わり
+      do {
+        // フィルタリング処理を実行
+        filterdData = data.filter(row => {
+          const elements = row.elements || [];
+      
+          const isValidElement = elements.some(element => {
+            const dataLevel = element.data?.level;
+            const dataHandle = element.data?.handle;
+            return (dataLevel >= -radius_thrd) && (dataHandle === handle);
+          });
+      
+          return isValidElement;
         });
-
-        return isValidElement;
-      });
+      
+        if (radius_thrd === 4) {
+          break;
+        }
+      
+        radius_thrd++;
+      
+      } while (filterdData.length < 10);
+      console.log(filterdData.length)
       const elementsRaw = filterdData.flatMap(item => item.elements);
 
       // 重複ノード削除
       const elementsWoDup = removeDuplicatesNodes(elementsRaw);
 
       // フィルタリング2: 単純な半径クリップ
+      // console.log(elementsWoDup.length)
       elements = elementsWoDup.filter(item => {
         // 'data' が存在する場合は 'level' をチェック
         if (item.data && item.data.level !== undefined) {
-          return item.data.level >= -RADIUS_CLIP;  // -4 以上のレベルを保持
+          return item.data.level >= -RADIUS_CLIP;
         }
         // 'data' が存在しないか、'level' が undefined の場合は保持
         return true;
       });
+
     } else {
       // 相関図データがひろがる内にないので制限モードで最低限のデータを返す
       elements = await getElementsAndSetDb(handle, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP, false);
@@ -88,9 +104,10 @@ export async function getData(handle) {
       }
     }
 
-    return elementsFiltered;
+    return elements;
 
   } catch (e) {
-    throw e;
+    console.error(e);
+    throw "Server error occured.";
   }
 }
