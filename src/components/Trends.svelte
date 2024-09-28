@@ -1,8 +1,8 @@
 <script>
-  import { Drawer, Button, CloseButton } from 'flowbite-svelte';
+  import { Drawer, Button, CloseButton, Tooltip } from 'flowbite-svelte';
   import { Tabs, TabItem } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
-  import { FireOutline, ArrowRightOutline } from 'flowbite-svelte-icons';
+  import { FireOutline, ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
 
   let isFirstRun = true;
@@ -69,10 +69,18 @@
 <!-- Drawer (左から展開するフレーム) -->
 <Drawer bind:hidden={isTrendsHidden} {transitionParams} placement="left" transitionType="fly" id="trendBar">
   <div class="p-4 relative">
-    <div class="flex items-center">
-      <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+    <div class="flex items-center justify-center h-full w-full mb-2">
+      <h5 id="drawer-label" class="inline-flex items-center text-base font-semibold text-gray-500 dark:text-gray-400">
         <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in<br>Blu-lyzer's Users
       </h5>
+      <span class="ml-1">
+        <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
+        <Tooltip class="z-10 text-xs">
+          Blu-lyzerユーザのトレンドワード<br>
+          Inc. Rateは増加率。昨日に対してどれだけ多くポストされたかを表示<br>
+          Countは単純な合計。今日ポストされた回数を表示
+        </Tooltip>
+      </span>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
     <Tabs>
@@ -82,8 +90,10 @@
             {#each trendsIncRate as trend, i}
               <div class="flex">
                 <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+                <p class={`w-2/4 ${getClass(i)}`}>
+                  <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
+                </p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}x</p>
               </div>
             {/each}    
           </div>
@@ -94,7 +104,9 @@
             {#each trendsToday as trend, i}
               <div class="flex">
                 <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
+                <p class={`w-2/4 ${getClass(i)}`}>
+                  <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
+                </p>
                 <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
               </div>
             {/each}    
