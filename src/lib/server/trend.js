@@ -1,15 +1,16 @@
-import { getAllRows } from "./supabase";
+import { err } from "inngest/types";
+import { getAllRows, getRandomRows, supabase } from "./supabase";
+
+const RECORDS_NUM = 1000;
 
 export async function getTrend() {
   const trendsToday = [];
   const trendsIncRate = [];
 
-  // recordsのデータをページネーションですべて取得
-  const params = {
+  const data = await getAllRows({
     tableName: 'records',
     rowQuery: 'result_analyze',
-  }
-  const data = await getAllRows(params);
+  });
 
   // 各レコードデータに対して、
   // result_analyze.wordFreqFullMapがあれば、それをマージしていく
