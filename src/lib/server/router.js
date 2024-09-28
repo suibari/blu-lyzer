@@ -90,7 +90,7 @@ export async function getData(handle) {
 
     } else {
       // 対象ハンドルが入っている相関図データがデータベースにないので制限モードで最低限のデータを返す
-      elements = getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
+      elements = await getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
     }
 
     // 解析データセット
