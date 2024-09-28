@@ -2,7 +2,7 @@ import { SUPABASE_URL, SUPABASE_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-const PAGE_SIZE = 1000;
+const PAGE_SIZE = 200;
 
 /**
  * params.tableName, params.rowQury で指定テーブルの全rowをページネーションで取得

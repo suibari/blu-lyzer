@@ -2,10 +2,13 @@ import { getTrend } from "$lib/server/trend";
 
 export async function GET({ request }) {
   try {
-    const trends = await getTrend();
+    const {trendsToday, trendsIncRate} = await getTrend();
 
     console.log(`[INFO] send trends object.`);
-    return new Response(JSON.stringify({ trends: trends.slice(0, 100) }), {
+    return new Response(JSON.stringify({
+      trendsToday: trendsToday.slice(0, 100),
+      trendsIncRate: trendsIncRate.slice(0, 100),
+    }), {
       headers: { 'Content-Type': 'application/json' }
   });
   } catch (e) {
