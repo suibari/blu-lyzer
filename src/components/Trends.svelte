@@ -1,9 +1,11 @@
 <script>
   import { Drawer, Button, CloseButton } from 'flowbite-svelte';
+  import { Tabs, TabItem } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
   import { FireOutline, ArrowRightOutline } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
 
+  let isFirstRun = true;
   let isRunning = false;
   let isTrendsHidden = true;
   let transitionParams = {
@@ -16,25 +18,29 @@
 
   async function handleTrends() {
     isTrendsHidden = false;
-    isRunning = true;
 
-    try {
-      const response = await fetch('/api/trends');
-      if (response.ok) {
-        const result = await response.json();
-        trendsToday = result.trendsToday;
-        trendsIncRate = result.trendsIncRate;
+    if (isFirstRun) {
+      isRunning = true;
 
-        // console.log(result.trends);
-      } else {
-        throw new Error('bad response');
+      try {
+        const response = await fetch('/api/trends');
+        if (response.ok) {
+          const result = await response.json();
+          trendsToday = result.trendsToday;
+          trendsIncRate = result.trendsIncRate;
+
+          // console.log(result.trends);
+        } else {
+          throw new Error('bad response');
+        }
+        
+      } catch (error) {
+        throw new Error('failed to fetch');
       }
-      
-    } catch (error) {
-      throw new Error('failed to fetch');
     }
-
+    
     isRunning = false;
+    isFirstRun = false;
   }
 
   function getClass(index) {
@@ -68,19 +74,42 @@
       </h5>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
-    <div class="mt-4 space-y-4">
-      {#each trendsIncRate as trend, i}
-        <div class="flex">
-          <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-          <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
-          <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
-        </div>
-      {/each}    
-    </div>
+    <Tabs>
+      <TabItem open title="Inc. Rate">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="mt-4 space-y-4">
+            {#each trendsIncRate as trend, i}
+              <div class="flex">
+                <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
+                <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+              </div>
+            {/each}    
+          </div>
+      </TabItem>
+      <TabItem title="Count">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="mt-4 space-y-4">
+            {#each trendsToday as trend, i}
+              <div class="flex">
+                <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
+                <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+              </div>
+            {/each}    
+          </div>
+      </TabItem>
+    </Tabs>
   </div>
   {#if isRunning}
     <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
-      <Spinner size={16} />
+      <div class="flex-col text-sm justify-center items-center text-center">
+        <Spinner size={16} class="mb-2" />
+        <p>読み込み中...</p>
+        <p>20秒ほどかかります</p>
+        <p>タブを閉じても処理は継続するので</p>
+        <p>他のメニューをお楽しみください</p>
+      </div>
     </div>
   {/if}
 </Drawer>

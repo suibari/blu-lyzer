@@ -2,7 +2,7 @@ import { SUPABASE_URL, SUPABASE_KEY } from '$env/static/private';
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-const PAGE_SIZE = 200;
+const PAGE_SIZE = 1000;
 
 /**
  * params.tableName, params.rowQury で指定テーブルの全rowをページネーションで取得
@@ -18,6 +18,7 @@ export async function getAllRows(params) {
       .from(params.tableName)
       .select(params.rowQuery)
       .range(from, to);  // レコードの範囲を指定
+    console.log(`[INFO] select record: ${pageData.length}`);
 
     if (error) {
       console.error("Error fetching data:", error);
