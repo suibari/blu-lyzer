@@ -1,4 +1,4 @@
-import { PUBLIC_NODE_ENV } from '$env/static/private';
+import { PUBLIC_NODE_ENV } from '$env/static/public';
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { getConcatElementsAroundHandle } from "./element";
