@@ -19,7 +19,7 @@
   async function handleTrends() {
     isTrendsHidden = false;
 
-    if (isFirstRun) {
+    if (isFirstRun && !isRunning) {
       isRunning = true;
 
       try {
@@ -37,9 +37,10 @@
       } catch (error) {
         throw new Error('failed to fetch');
       }
+
+      isRunning = false;
     }
     
-    isRunning = false;
     isFirstRun = false;
   }
 
@@ -106,7 +107,7 @@
       <div class="flex-col text-sm justify-center items-center text-center">
         <Spinner size={16} class="mb-2" />
         <p>読み込み中...</p>
-        <p>20秒ほどかかります</p>
+        <p>20~30秒ほどかかります</p>
         <p>タブを閉じても処理は継続するので</p>
         <p>他のメニューをお楽しみください</p>
       </div>
