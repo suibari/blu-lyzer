@@ -1,12 +1,12 @@
-
+import { PUBLIC_NODE_ENV } from '$env/static/private';
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
-import { getElementsAndSetDb } from "./element";
+import { getConcatElementsAroundHandle } from "./element";
 import { inngest } from '$lib/inngest/inngest';
 
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1; // RADIUS_THRD_INC_USER 以下推奨
-const THRESHOLD_TL_TMP = 200;
+const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 
@@ -14,6 +14,9 @@ export async function getData(handle) {
   let radius_thrd = 0;
   let filterdData = [];
   let elements = {};
+
+  // 特殊文字エスケープ
+  handle = cleanString(handle);
 
   try {
     // handleが相関図内に含まれる相関図データをすべて取得(中心が自分を問わない)
@@ -25,15 +28,21 @@ export async function getData(handle) {
     // 自分が含まれる相関図がないまたは前回実行から1時間以上経過していたら、inngestイベント駆動
     const myData = data.find(row => row.handle === handle);
     const currentTime = new Date();
-    if (!myData) {
-      // myDataが見つからない（自分が含まれる相関図がない）場合の処理
-      await inngest.send({ name: 'blu-lyzer/updateDb.elements', data: { handle } });
+
+    // バックグラウンド実行判断、ローカルでは常に実行
+    if (PUBLIC_NODE_ENV === 'development') {
+      await inngest.send({ name: 'blu-lyzer/start.workflow', data: { handle } });
     } else {
-      const updatedAt = new Date(myData.updated_at);
-      const timeDiff = currentTime - updatedAt;
-      // 1時間以上経過していたら
-      if (timeDiff > ONE_HOUR_IN_MS) {
-        await inngest.send({ name: 'blu-lyzer/updateDb.elements', data: { handle } });
+      if (!myData) {
+        // myDataが見つからない（自分が含まれる相関図がない）場合の処理
+        await inngest.send({ name: 'blu-lyzer/start.workflow', data: { handle } });
+      } else {
+        const updatedAt = new Date(myData.updated_at);
+        const timeDiff = currentTime - updatedAt;
+        // 1時間以上経過していたら
+        if (timeDiff > ONE_HOUR_IN_MS) {
+          await inngest.send({ name: 'blu-lyzer/start.workflow', data: { handle } });
+        }
       }
     }
     
@@ -80,8 +89,8 @@ export async function getData(handle) {
       });
 
     } else {
-      // 相関図データがひろがる内にないので制限モードで最低限のデータを返す
-      elements = await getElementsAndSetDb(handle, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP, false);
+      // 対象ハンドルが入っている相関図データがデータベースにないので制限モードで最低限のデータを返す
+      elements = getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
     }
 
     // 解析データセット
@@ -111,3 +120,7 @@ export async function getData(handle) {
     throw "Server error occured.";
   }
 }
+
+const cleanString = (str) => {
+  return str.replace(/[\u200B\u200C\u200D\uFEFF\u202A-\u202E\u00A0\u0000-\u001F\u007F]/g, '');
+};

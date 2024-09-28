@@ -1,7 +1,7 @@
 import { BSKY_IDENTIFIER, BSKY_APP_PASSWORD } from '$env/static/private';
 import { inngest } from './inngest';
 import { agent } from '../server/bluesky';
-import { getElementsAndSetDb } from '$lib/server/element';
+import { getElements } from '$lib/server/element';
 import { analyzeRecords } from '$lib/server/submodule/src/analyze';
 import { TimeLogger } from '$lib/server/logger';
 import { supabase } from '$lib/server/supabase';
@@ -9,35 +9,69 @@ import { supabase } from '$lib/server/supabase';
 const THRESHOLD_TL_MAX = 4000;
 const THRESHOLD_LIKES_MAX = 1000;
 const ELEM_NUM_PER_GROUP = 20;
+const RADIUS_CLIP = 1;
+
+// 自分+周辺のelementsアップデート、自分+周辺のrecordsアップデートを行うワークフロー
+export const workflow = inngest.createFunction(
+  "Sequential Workflow with Handles",
+  { event: "blu-lyzer/start.workflow" },  // ワークフローのトリガー
+  async ({ event, step }) => {
+    const handle = event.data.handle;
+
+    // 1. handleを使ってget-elements-and-update-dbを実行
+    const {success, elements} = await step.run("Get Elements Center-User", async () => {
+      return await getElementsAndUpdateDbFunction(handle);
+    });
+    
+    // 2. 配列の1~6番目のelement.data.handleを取得 (handlesForElements)
+    const handlesForElements = elements.slice(1, RADIUS_CLIP*6).map(el => el.data.handle);
+
+    // 3. 配列の0~19番目のelement.data.handleを取得 (handlesForRecords)
+    const handlesForRecords = elements.slice(0, ELEM_NUM_PER_GROUP).map(el => el.data.handle);
+
+    // 4. handlesForElementsに対して1つずつget-elements-and-update-dbを実行
+    for (const handleElement of handlesForElements) {
+      await step.run(`Get Elements for handle ${handleElement}`, async () => {
+        return await getElementsAndUpdateDbFunction(handleElement)
+      });
+    }
+
+    // 5. handlesForRecordsに対して1つずつget-records-and-update-dbを実行
+    for (const handleRecord of handlesForRecords) {
+      await step.run(`Get Records for handle ${handleRecord}`, async () => {
+        return await getRecordsAndUpdateDbFunction(handleRecord)
+      });
+    }
+  }
+);
 
 // Inngestの関数を定義
-export const getElementsAndUpdateDbFunction = inngest.createFunction(
-  { id: 'Update Database By Elements' },  // ワークフローの名前
-  { event: 'blu-lyzer/updateDb.elements' },         // トリガーされるイベント名
-  async ({ event }) => {
+export const getElementsAndUpdateDbFunction = 
+  async (handle) => {
     const timeLogger = new TimeLogger();
     timeLogger.tic();
-
-    const { handle } = event.data;
 
     console.log(`[INNGEST] ELEM: Executing update elements: ${handle}`);
 
     try {
-      await getElementsAndSetDb(handle, THRESHOLD_TL_MAX, THRESHOLD_LIKES_MAX, true);
-      console.log(`[INNGEST] ELEM: Successfully updated DB for elements: ${handle}`);
+      // 相関図取得
+      const elements = await getElements(handle, THRESHOLD_TL_MAX, THRESHOLD_LIKES_MAX);
+      
+      // データベース更新
+      const { data, err } = await supabase.from('elements').upsert({ handle, elements, updated_at: new Date() }).select();
+      if (err) console.error("Error", err);
 
       // 芋づる式にイベント駆動
-      await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G0', data: { handle } });
-      await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G1', data: { handle } });
+      // await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G0', data: { handle } });
 
       console.log(`[INNGEST] ELEM: exec time was ${timeLogger.tac()} [sec]: ${handle}`);
-      return { success: true };
+
+      return { success: true, elements };
     } catch (e) {
       console.error(`[INNGEST] ELEM: Failed to update DB for elements: ${handle}`, e);
       return { success: false, error: e.message };
     }
   }
-);
 
 export function getPostsLikesAndUpdateDbFunction(group) {
   return inngest.createFunction(
@@ -104,3 +138,32 @@ export const analyzeRecordsFunction = inngest.createFunction(
     }
   }
 );
+
+export const getRecordsAndUpdateDbFunction = 
+  async (handle) => {
+    const timeLogger = new TimeLogger();
+    timeLogger.tic();
+
+    // Records
+    await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
+    const records = await agent.getLatestPostsAndLikes(handle);
+
+    // Analyze
+    const response = await agent.getProfile({actor: handle});
+    const result = await analyzeRecords(records);
+
+    // Upsert
+    const {data, error} = await supabase.from('records').upsert({
+      handle: handle,
+      profile: response.data,
+      records: null,
+      result_analyze: result,
+      updated_at: new Date()
+    }).select();
+
+    if (error) {
+      console.error("Error", error);
+    } else {
+      console.log(`[INNGEST] RECORDS exec time was ${timeLogger.tac()} [sec]: ${handle}`);
+    }
+  }

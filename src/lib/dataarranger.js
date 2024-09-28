@@ -97,6 +97,7 @@ export function groupElementsWithCompoundNodes(elements) {
   const nodeToCompoundMap = {};
   const existingCompoundNodes = new Set(); // Track already compounded nodes
   const childAssigned = new Set(); // Track child nodes that have already been assigned to a compound
+  let filteredCompoundElements = [];
 
   // expand時用に最初に重複ノード削除
   removeDuplicatesNodes(elements);
@@ -181,13 +182,18 @@ export function groupElementsWithCompoundNodes(elements) {
   });
 
   // 子ノードが 2 つ以上存在しないコンパウンドノードを削除
-  const filteredCompoundElements = compoundElements.filter(el => {
-    if (el.group === 'nodes' && el.data.id.startsWith('group-')) {
-      // コンパウンドノードの子ノード数が 2 未満のものは削除
-      return parentToChildrenCount[el.data.id] >= 2;
-    }
-    return true; // ノード以外（エッジなど）はフィルタリングしない
-  });
+  if (compoundElements.length > 0) {
+    filteredCompoundElements = compoundElements.filter(el => {
+      if (el.group === 'nodes' && el.data.id.startsWith('group-')) {
+        // コンパウンドノードの子ノード数が 2 未満のものは削除
+        return parentToChildrenCount[el.data.id] >= 2;
+      }
+      return true; // ノード以外（エッジなど）はフィルタリングしない
+    });
+  } else {
+    // コンパウンドノードが一つもない場合、ノードすべてをそのまま代入
+    filteredCompoundElements = elements.filter(el => el.group === 'nodes');
+  }
 
   // 元のエッジを追加する
   const edges = elements.filter(el => el.group === 'edges');

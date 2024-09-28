@@ -9,62 +9,62 @@ const SCORE_LIKE = 1;
 const MAX_RADIUS = 10;
 const RETRY_COUNT_GET_ELEM = 3;
 
-export async function getElementsAndSetDb(handle, threshold_tl, threshold_like, setDbEn) {
-  // 再試行回数
-  let attempts = 0;
+// 入力ハンドルの相関図データを生成
+// 相関図中心付近のハンドルについても生成
+// 結合して返す
+export async function getConcatElementsAroundHandle(handle, friendNum, threshold_tl, threshold_like) {
+  let concatElements = [];
 
-  while (attempts < RETRY_COUNT_GET_ELEM) {
-    try {
-      attempts++;
-      await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
+  // 自分の相関図
+  const myElements = await getElements(handle, threshold_tl, threshold_like);
+  concatElements = myElements;
 
-      let response;
-      response = await agent.getProfile({actor: handle});
-      const myselfWithProf = response.data;
-
-      // 自分のタイムラインTHRESHOLD_TL件および自分のいいねTHRESHOLD_LIKES件を取得
-      let friendsWithProf = await agent.getInvolvedEngagements(handle, threshold_tl, threshold_like, SCORE_REPLY, SCORE_LIKE);
-
-      // 要素数がTHRESHOLD_NODESに満たなければ、相互フォロー追加
-      let didArray;
-      if (friendsWithProf.length < THRESHOLD_NODES) {
-        response = await agent.getFollows({actor: handle, limit: 50});
-        const follows = response.data.follows;
-        didArray = follows.map(follow => follow.did);
-        const mutualWithProf = await agent.getConcatProfiles(didArray);
-        friendsWithProf = friendsWithProf.concat(mutualWithProf);
-      }
-
-      // 重複ノード削除: getElementsより先にやらないとnodesがTHRESHOLD_NODESより少なくなる
-      const allWithProf = agent.removeDuplicatesProfs([myselfWithProf].concat(friendsWithProf));
-
-      // あまりに大きい相関図を送ると通信料がえげつないのでMAX_RADIUS段でクリップする
-      const slicedAllWithProf = allWithProf.slice(0, 1 + 3 * (MAX_RADIUS - 1) * ((MAX_RADIUS - 1) + 1));
-
-      // node, edge取得
-      const elements = await getElements(slicedAllWithProf);
-
-      // 不要エッジ除去
-      removeInvalidLinks(elements);
-
-      // DBセット
-      if (setDbEn) {
-        const { data, err } = await supabase.from('elements').upsert({ handle: handle, elements: elements, updated_at: new Date() }).select();
-        if (err) console.error("Error", err);
-      }
-      
-      return elements;
-
-    } catch (error) {
-      console.error(`Attempt ${attempts} failed: ${error}`);
-      if (attempts >= RETRY_COUNT_GET_ELEM) {
-        throw new Error('Max retry attempts reached');
-      }
-    }
+  // 友人の相関図
+  const handlesFriend = myElements.map(element => element.data.handle);
+  for (const handle of handlesFriend.slice(1, friendNum)) { // 自分の相関図で自分以外中心の相関図も取得
+    const elementFriend = await getElements(handle, threshold_tl, threshold_like);
+    concatElements = concatElements.concat(elementFriend);
   }
+
+  return concatElements;
 }
 
-export async function getElements(allWithProf) {
+export async function getElements(handle, threshold_tl, threshold_like) {
+  await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
+
+  let response;
+  response = await agent.getProfile({actor: handle});
+  const myselfWithProf = response.data;
+
+  // 自分のタイムラインTHRESHOLD_TL件および自分のいいねTHRESHOLD_LIKES件を取得
+  let friendsWithProf = await agent.getInvolvedEngagements(handle, threshold_tl, threshold_like, SCORE_REPLY, SCORE_LIKE);
+
+  // 要素数がTHRESHOLD_NODESに満たなければ、相互フォロー追加
+  let didArray;
+  if (friendsWithProf.length < THRESHOLD_NODES) {
+    response = await agent.getFollows({actor: handle, limit: 50});
+    const follows = response.data.follows;
+    didArray = follows.map(follow => follow.did);
+    const mutualWithProf = await agent.getConcatProfiles(didArray);
+    friendsWithProf = friendsWithProf.concat(mutualWithProf);
+  }
+
+  // 重複ノード削除: getElementsより先にやらないとnodesがTHRESHOLD_NODESより少なくなる
+  const allWithProf = agent.removeDuplicatesProfs([myselfWithProf].concat(friendsWithProf));
+
+  // あまりに大きい相関図を送ると通信料がえげつないのでMAX_RADIUS段でクリップする
+  const slicedAllWithProf = allWithProf.slice(0, 1 + 3 * (MAX_RADIUS - 1) * ((MAX_RADIUS - 1) + 1));
+
+  // node, edge取得
+  const elements = await convertElementsFromProf(slicedAllWithProf);
+
+  // 不要エッジ除去
+  removeInvalidLinks(elements);
+  
+  return elements;
+}
+
+async function convertElementsFromProf(allWithProf) {
   let elements = [];
   let sum = 0;
   let groupSizes = [];
