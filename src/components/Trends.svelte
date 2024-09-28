@@ -11,7 +11,8 @@
     duration: 200,
     easing: sineIn
   };
-  let trends = [];
+  let trendsToday = [];
+  let trendsIncRate = [];
 
   async function handleTrends() {
     isTrendsHidden = false;
@@ -21,7 +22,8 @@
       const response = await fetch('/api/trends');
       if (response.ok) {
         const result = await response.json();
-        trends = result.trends
+        trendsToday = result.trendsToday;
+        trendsIncRate = result.trendsIncRate;
 
         // console.log(result.trends);
       } else {
@@ -67,11 +69,11 @@
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
     <div class="mt-4 space-y-4">
-      {#each trends as trend, i}
+      {#each trendsIncRate as trend, i}
         <div class="flex">
           <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-          <p class={`w-2/4 ${getClass(i)}`}>{trend[0]}</p>
-          <p class={`w-1/4 text-right ${getClass(i)}`}>{trend[1]}</p>
+          <p class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
+          <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
         </div>
       {/each}    
     </div>
