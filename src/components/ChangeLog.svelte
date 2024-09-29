@@ -10,6 +10,9 @@
 
 <Modal title="よくある質問" bind:open={isOpenChangeLog} autoclose outsideclose>
 	<div>
+    <h1 class="text-xl font-bold mt-2">v0.1.1</h1>
+    <p>ひろがるBluesky! を使ったことがないユーザの情報も得られるよう修正 part2</p>
+    <p>バックグラウンド処理が適切に行われなかったのを改善</p>
     <h1 class="text-xl font-bold mt-2">v0.1.0</h1>
 		<p><a href="https://www.cl.ecei.tohoku.ac.jp/Open_Resources-Japanese_Sentiment_Polarity_Dictionary.html" target="_blank">日本語極性評価辞書</a> による感情分析機能を追加</p>
     <p>相関図接続処理を見直し、初期状態で多めにノードが配置されるよう修正</p>

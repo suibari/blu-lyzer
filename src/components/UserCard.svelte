@@ -206,8 +206,12 @@
                     -10に近づけばネガティブと言えます
                   </Tooltip>
                 </span>
-                <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(averageSentimentScore * 100 * 100) /100}</h3>
-                <h5 class="ml-1 mr-4">[/word]</h5>
+                {#if tappedNode.data('wordFreqMap')}
+                  <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900">{Math.round(averageSentimentScore * 100 * 100) /100}</h3>
+                  <h5 class="ml-1 mr-4">[/word]</h5>
+                {:else}
+                  <h3 class="ml-2 text-xl font-bold tracking-tight text-gray-900 truncate">No Data</h3>
+                {/if}
               </div>
             <div class="flex">
               <div class="flex items-end mb-2">
