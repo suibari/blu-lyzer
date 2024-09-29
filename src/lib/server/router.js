@@ -3,38 +3,48 @@ import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { getConcatElementsAroundHandle } from "./element";
 import { inngest } from '$lib/inngest/inngest';
+import { err } from 'inngest/types';
 
 const RADIUS_THRD_INC_USER = 1;
-const RADIUS_CLIP = 1; // RADIUS_THRD_INC_USER 以下推奨
+const RADIUS_CLIP = 1;
+const MAX_RADIUS_CLIP = 4;
+const LEAST_ELEMENT_LENGTH = 1000;
 const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 
 export async function getData(handle) {
   let radius_thrd = 0;
-  let filterdData = [];
-  let elements = {};
+  let filteredData = [];
+  let elementsRaw = [];
+  let elements = [];
 
   // 特殊文字エスケープ
   handle = cleanString(handle);
 
   try {
+    // ----------------
     // handleが相関図内に含まれる相関図データをすべて取得(中心が自分を問わない)
     // elements[].data.handleが引数handleに一致する行をすべて取得
     let { data, error } = await supabase
-      .from('elements')
-      .select('*')
-      .filter('elements', 'cs', JSON.stringify([{ data: { handle: handle } }]));
-    // 自分が含まれる相関図がないまたは前回実行から1時間以上経過していたら、inngestイベント駆動
+    .rpc('get_matching_elements', {
+      p_handle: handle,      // ストアドプロシージャに渡す handle 値
+      p_level_threshold: RADIUS_THRD_INC_USER  // levelの閾値
+    });
+    if (error) {
+      console.error(error);
+      throw error;
+    }
     const myData = data.find(row => row.handle === handle);
     const currentTime = new Date();
 
+    // ----------------
     // バックグラウンド実行判断、ローカルでは常に実行
     if (PUBLIC_NODE_ENV === 'development') {
       await inngest.send({ name: 'blu-lyzer/start.workflow', data: { handle } });
     } else {
       if (!myData) {
-        // myDataが見つからない（自分が含まれる相関図がない）場合の処理
+        // myDataが見つからない（自分が中心の相関図がない）場合の処理
         await inngest.send({ name: 'blu-lyzer/start.workflow', data: { handle } });
       } else {
         const updatedAt = new Date(myData.updated_at);
@@ -45,59 +55,57 @@ export async function getData(handle) {
         }
       }
     }
-    
+
+    // ----------------
+    // 相関図データ整形
+    // DBから相関図が得られたならそれを適宜拡大していい大きさでユーザに返す
+    // 得られなかったら臨時データを集めてユーザに返す
     if (data.length > 0) {
-      // 相関図データがあるのでデータ整形を行う
-      // フィルタリング1: 指定半径内に指定ユーザが入っているレコードのみ使う
-      //   filteredDataの要素数が10を超えるまで相関図半径を広げてサーチ。ただし半径4になったらそこで終わり
+      let radiusClip = RADIUS_CLIP;
       do {
-        // フィルタリング処理を実行
-        filterdData = data.filter(row => {
-          const elements = row.elements || [];
-      
-          const isValidElement = elements.some(element => {
-            const dataLevel = element.data?.level;
-            const dataHandle = element.data?.handle;
-            return (dataLevel >= -radius_thrd) && (dataHandle === handle);
-          });
-      
-          return isValidElement;
+        // フィルタリング処理
+        filteredData = data.map(row => {
+          if (row.elements && Array.isArray(row.elements)) {
+            const filteredElements = row.elements.filter(element => {
+              if (element.data && element.data.level !== undefined) {
+                return element.data.level >= -radiusClip;
+              }
+              return true;
+            });
+
+            return {
+              ...row,
+              elements: filteredElements, // フィルタリングしたelementsをセット
+            };
+          }
+          return row; // row.elementsがない場合はそのまま返す
         });
-      
-        if (radius_thrd === 4) {
-          break;
+
+        // filteredData.elementsを連結し、その長さをチェック
+        elementsRaw = filteredData.flatMap(item => item.elements);
+        
+        // RADIUS_CLIPが最大値未満かつ、totalElementsLengthが1000未満の場合
+        if (elementsRaw.length < LEAST_ELEMENT_LENGTH && radiusClip < MAX_RADIUS_CLIP) {
+          radiusClip++; // RADIUS_CLIPをインクリメント
+        } else {
+          break; // 条件を満たさなければループを抜ける
         }
-      
-        radius_thrd++;
-      
-      } while (filterdData.length < 10);
-      console.log(filterdData.length)
-      const elementsRaw = filterdData.flatMap(item => item.elements);
+      } while (true); // 条件を満たさない限りループを続ける
 
       // 重複ノード削除
-      const elementsWoDup = removeDuplicatesNodes(elementsRaw);
-
-      // フィルタリング2: 単純な半径クリップ
-      // console.log(elementsWoDup.length)
-      elements = elementsWoDup.filter(item => {
-        // 'data' が存在する場合は 'level' をチェック
-        if (item.data && item.data.level !== undefined) {
-          return item.data.level >= -RADIUS_CLIP;
-        }
-        // 'data' が存在しないか、'level' が undefined の場合は保持
-        return true;
-      });
+      elements = removeDuplicatesNodes(elementsRaw);
 
     } else {
       // 対象ハンドルが入っている相関図データがデータベースにないので制限モードで最低限のデータを返す
       elements = await getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
     }
 
+    // ----------------
     // 解析データセット
     const nodes = elements.filter(element => (element.group === 'nodes'));
     const handles = nodes.map(node => node.data.handle);
-    ({data, error} = await supabase.from('records').select('handle, records, result_analyze').in('handle', handles)); // 周辺ユーザの解析データ取得
-    if (data.length > 0) {
+    ({data, error} = await supabase.from('records').select('handle, result_analyze').in('handle', handles)); // 周辺ユーザの解析データ取得
+    if (!error) {
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
 
