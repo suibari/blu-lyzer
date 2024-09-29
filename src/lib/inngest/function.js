@@ -20,7 +20,7 @@ export const workflow = inngest.createFunction(
 
     // 1. handleを使ってget-elements-and-update-dbを実行
     const {success, elements} = await step.run("Get Elements Center-User", async () => {
-      return await getElementsAndUpdateDbFunction(handle);
+      return await getElementsAndUpdateDbFunction(handle, true);
     });
     
     // 2. 配列の1~6番目のelement.data.handleを取得 (handlesForElements)
@@ -47,26 +47,33 @@ export const workflow = inngest.createFunction(
 
 // Inngestの関数を定義
 export const getElementsAndUpdateDbFunction = 
-  async (handle) => {
+  async (handle, isForceUpdate) => {
     const timeLogger = new TimeLogger();
     timeLogger.tic();
 
     console.log(`[INNGEST] ELEM: Executing update elements: ${handle}`);
 
     try {
-      // 相関図取得
-      const elements = await getElements(handle, THRESHOLD_TL_MAX, THRESHOLD_LIKES_MAX);
-      
-      // データベース更新
-      const { data, err } = await supabase.from('elements').upsert({ handle, elements, updated_at: new Date() }).select();
-      if (err) console.error("Error", err);
+      // elementsの更新時間を見て1時間以上なら更新する
+      let {data, error} = await supabase.from('elements').select('updated_at').eq('handle', handle);
+      if (isForceUpdate || data.length === 0 || (data.length === 1 && isPastOneHourOnUpdate(data[0].updated_at))) {
 
-      // 芋づる式にイベント駆動
-      // await inngest.send({ name: 'blu-lyzer/updateDb.postsAndLikes.G0', data: { handle } });
+        // 相関図取得
+        const elements = await getElements(handle, THRESHOLD_TL_MAX, THRESHOLD_LIKES_MAX);
+              
+        // データベース更新
+        ({ data, error } = await supabase.from('elements').upsert({ handle, elements, updated_at: new Date() }).select());
+        if (error) console.error("Error", error);
 
-      console.log(`[INNGEST] ELEM: exec time was ${timeLogger.tac()} [sec]: ${handle}`);
+        console.log(`[INNGEST] ELEM: exec time was ${timeLogger.tac()} [sec]: ${handle}`);
 
-      return { success: true, elements };
+        return { success: true, elements };
+        
+      } else {
+        console.log(`[INNGEST] ELEM: no exec for updated recently: ${handle}`);
+
+        return { success: true };
+      }
     } catch (e) {
       console.error(`[INNGEST] ELEM: Failed to update DB for elements: ${handle}`, e);
       return { success: false, error: e.message };
@@ -78,26 +85,51 @@ export const getRecordsAndUpdateDbFunction =
     const timeLogger = new TimeLogger();
     timeLogger.tic();
 
-    // Records
-    await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
-    const records = await agent.getLatestPostsAndLikes(handle);
+    // recordsの更新時間を見て1時間以上なら更新する
+    let {data, error} = await supabase.from('records').select('updated_at').eq('handle', handle);
+    if (data.length === 0 || (data.length === 1 && isPastOneHourOnUpdate(data[0].updated_at))) {
 
-    // Analyze
-    const response = await agent.getProfile({actor: handle});
-    const result = await analyzeRecords(records);
+      // Records
+      await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
+      const records = await agent.getLatestPostsAndLikes(handle);
 
-    // Upsert
-    const {data, error} = await supabase.from('records').upsert({
-      handle: handle,
-      profile: response.data,
-      records: null,
-      result_analyze: result,
-      updated_at: new Date()
-    }).select();
+      // Analyze
+      const response = await agent.getProfile({actor: handle});
+      const result = await analyzeRecords(records);
 
-    if (error) {
-      console.error("Error", error);
+      // Upsert
+      ({data, error} = await supabase.from('records').upsert({
+        handle: handle,
+        profile: response.data,
+        records: null,
+        result_analyze: result,
+        updated_at: new Date()
+      }).select());
+
+      if (error) {
+        console.error("Error", error);
+        throw error;
+      } else {
+        console.log(`[INNGEST] RECORDS exec time was ${timeLogger.tac()} [sec]: ${handle}`);
+      }
+
     } else {
-      console.log(`[INNGEST] RECORDS exec time was ${timeLogger.tac()} [sec]: ${handle}`);
-    }
+      console.log(`[INNGEST] RECORDS: no exec for updated recently: ${handle}`);
+
+      return { success: true };
+    } 
   }
+
+function isPastOneHourOnUpdate(updated_at) {
+  const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+
+  const currentTime = new Date();
+  const updatedAt = new Date(updated_at);
+  const timeDiff = currentTime - updatedAt;
+
+  if (timeDiff > ONE_HOUR_IN_MS) {
+    return true;
+  } else {
+    return false;
+  }
+}
