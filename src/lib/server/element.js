@@ -64,6 +64,33 @@ export async function getElements(handle, threshold_tl, threshold_like) {
   return elements;
 }
 
+// concatしたelementsを入れて、各elementsを徐々に拡大していく
+export function expandElementsGradually(elements) {
+  let elementsFiltered = [];
+  let radiusClip = 1;
+  const MAX_RADIUS_CLIP = 4;
+  const LEAST_ELEMENT_LENGTH = 300;
+
+  do {
+    // フィルタリング処理
+    elementsFiltered = elements.filter(element => {
+      if (element.data && element.data.level !== undefined) {
+        return element.data.level >= -radiusClip;
+      }
+      return true;
+    });
+    
+    // RADIUS_CLIPが最大値未満かつ、totalElementsLengthが1000未満の場合
+    if (elementsFiltered.length < LEAST_ELEMENT_LENGTH && radiusClip < MAX_RADIUS_CLIP) {
+      radiusClip++; // RADIUS_CLIPをインクリメント
+    } else {
+      break; // 条件を満たさなければループを抜ける
+    }
+  } while (true); // 条件を満たさない限りループを続ける
+
+  return elementsFiltered;
+}
+
 async function convertElementsFromProf(allWithProf) {
   let elements = [];
   let sum = 0;

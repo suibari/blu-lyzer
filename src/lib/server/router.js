@@ -1,14 +1,12 @@
 import { PUBLIC_NODE_ENV } from '$env/static/public';
 import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
-import { getConcatElementsAroundHandle } from "./element";
+import { getConcatElementsAroundHandle, expandElementsGradually } from "./element";
 import { inngest } from '$lib/inngest/inngest';
 import { err } from 'inngest/types';
 
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1;
-const MAX_RADIUS_CLIP = 4;
-const LEAST_ELEMENT_LENGTH = 400;
 const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
@@ -58,46 +56,19 @@ export async function getData(handle) {
 
     // ----------------
     // 相関図データ整形
-    // DBから相関図が得られたならそれを適宜拡大していい大きさでユーザに返す
+    // DBから相関図が2つ以上得られたならそれを適宜拡大していい大きさでユーザに返す
     // 得られなかったら臨時データを集めてユーザに返す
-    if (data.length > 0) {
-      let radiusClip = RADIUS_CLIP;
-      do {
-        // フィルタリング処理
-        filteredData = data.map(row => {
-          if (row.elements && Array.isArray(row.elements)) {
-            const filteredElements = row.elements.filter(element => {
-              if (element.data && element.data.level !== undefined) {
-                return element.data.level >= -radiusClip;
-              }
-              return true;
-            });
-
-            return {
-              ...row,
-              elements: filteredElements, // フィルタリングしたelementsをセット
-            };
-          }
-          return row; // row.elementsがない場合はそのまま返す
-        });
-
-        // filteredData.elementsを連結し、その長さをチェック
-        elementsRaw = filteredData.flatMap(item => item.elements);
-        
-        // RADIUS_CLIPが最大値未満かつ、totalElementsLengthが1000未満の場合
-        if (elementsRaw.length < LEAST_ELEMENT_LENGTH && radiusClip < MAX_RADIUS_CLIP) {
-          radiusClip++; // RADIUS_CLIPをインクリメント
-        } else {
-          break; // 条件を満たさなければループを抜ける
-        }
-      } while (true); // 条件を満たさない限りループを続ける
+    if (data.length > 1) {
+      const elementsConcat = data.flatMap(row => row.elements);
+      const elementsRaw = expandElementsGradually(elementsConcat);
 
       // 重複ノード削除
       elements = removeDuplicatesNodes(elementsRaw);
 
     } else {
       // 対象ハンドルが入っている相関図データがデータベースにないので制限モードで最低限のデータを返す
-      elements = await getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
+      const elementsConcat = await getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
+      elements = expandElementsGradually(elementsConcat);
     }
 
     // ----------------
