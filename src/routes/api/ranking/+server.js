@@ -2,10 +2,13 @@ import { getRanking } from "$lib/server/ranking";
 
 export async function GET({ request }) {
   try {
-    const ranking = await getRanking();
+    const {rankingAddict, rankingInfluencer} = await getRanking();
 
     console.log(`[INFO] send ranking object.`);
-    return new Response(JSON.stringify({ ranking: ranking.slice(0, 100) }), {
+    return new Response(JSON.stringify({
+      rankingAddict: rankingAddict.slice(0, 100),
+      rankingInfluencer: rankingInfluencer.slice(0, 100),
+    }), {
       headers: { 'Content-Type': 'application/json' }
   });
   } catch (e) {

@@ -1,5 +1,6 @@
 <script>
     import { Drawer, Button, CloseButton } from 'flowbite-svelte';
+    import { Tabs, TabItem } from 'flowbite-svelte';
     import { Spinner } from 'flowbite-svelte';
     import { FireOutline, ArrowRightOutline } from 'flowbite-svelte-icons';
     import { sineIn } from 'svelte/easing';
@@ -11,7 +12,8 @@
       duration: 200,
       easing: sineIn
     };
-    let ranking = [];
+    let rankingAddict = [];
+    let rankingInfluencer = [];
   
     async function handleRanking() {
       isRankingHidden = false;
@@ -21,7 +23,8 @@
         const response = await fetch('/api/ranking');
         if (response.ok) {
           const result = await response.json();
-          ranking = result.ranking
+          rankingAddict = result.rankingAddict;
+          rankingInfluencer = result.rankingInfluencer;
   
           // console.log(result.trends);
         } else {
@@ -57,7 +60,7 @@
     </button>
   </div>
   
-  <!-- Drawer (左から展開するフレーム) -->
+  <!-- Drawer (右から展開するフレーム) -->
   <Drawer bind:hidden={isRankingHidden} {transitionParams} placement="right" transitionType="fly" id="rankingBar">
     <div class="p-4 relative">
       <div class="flex items-center">
@@ -66,17 +69,36 @@
         </h5>
         <CloseButton on:click={() => (isRankingHidden = true)} class="mb-4 dark:text-white" />
       </div>
-      <div class="mt-4 space-y-4">
-        {#each ranking as rank, i}
-          <div class="flex-col">
-            <div class="flex">
-              <p class={`w-1/6 ${getClass(i)}`}>{i+1}.</p>
-              <p class={`w-full ${getClass(i)}`}>{rank.handle}</p>
+      <Tabs>
+        <TabItem open title="Addict">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="mt-4 space-y-4">
+              {#each rankingAddict as rank, i}
+                <div class="flex-col">
+                  <div class="flex">
+                    <p class={`w-1/6 ${getClass(i)}`}>{i+1}.</p>
+                    <p class={`w-full ${getClass(i)}`}>{rank.handle}</p>
+                  </div>
+                  <p class={`w-full text-right ${getClass(i)}`}>{Math.round(rank.averageInterval * 100) / 100} [s/act]</p>
+                </div>
+              {/each}    
             </div>
-            <p class={`w-full text-right ${getClass(i)}`}>{Math.round(rank.averageInterval * 100) / 100} [s/act]</p>
-          </div>
-        {/each}    
-      </div>
+        </TabItem>
+        <TabItem title="Influencer">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="mt-4 space-y-4">
+              {#each rankingInfluencer as rank, i}
+                <div class="flex-col">
+                  <div class="flex">
+                    <p class={`w-1/6 ${getClass(i)}`}>{i+1}.</p>
+                    <p class={`w-full ${getClass(i)}`}>{rank.handle}</p>
+                  </div>
+                  <p class={`w-full text-right ${getClass(i)}`}>{rank.metric}</p>
+                </div>
+              {/each}    
+            </div>
+        </TabItem>
+      </Tabs>
     </div>
     {#if isRunning}
       <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
