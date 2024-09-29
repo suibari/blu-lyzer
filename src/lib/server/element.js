@@ -1,5 +1,5 @@
 import { BSKY_IDENTIFIER, BSKY_APP_PASSWORD } from '$env/static/private';
-import { removeDuplicatesNodes, removeInvalidLinks } from '../dataarranger';
+import { removeInvalidNodesAndEdges } from '../dataarranger';
 import { agent } from "./bluesky";
 import { supabase } from './supabase';
 
@@ -59,7 +59,7 @@ export async function getElements(handle, threshold_tl, threshold_like) {
   const elements = await convertElementsFromProf(slicedAllWithProf);
 
   // 不要エッジ除去
-  removeInvalidLinks(elements);
+  removeInvalidNodesAndEdges(elements);
   
   return elements;
 }

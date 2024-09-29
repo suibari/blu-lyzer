@@ -8,7 +8,7 @@ import { err } from 'inngest/types';
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1;
 const MAX_RADIUS_CLIP = 4;
-const LEAST_ELEMENT_LENGTH = 1000;
+const LEAST_ELEMENT_LENGTH = 400;
 const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;

@@ -126,21 +126,14 @@
       // console.log(currentElements.length);
       // console.log(concatElements.length);
 
-      // ノードコンパウンド後の最終チェック
-      if ((currentElements.length > 0) && (currentElements.length >= concatElements.length)) {
-        messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
-        showInfoAlert = true;
-        isRunning = false;
-      } else {
-        // 描画
-        // console.log('adding elements...');
-        cyInstance.add(concatElements);
-        // console.log('added elements!');
-        
-        currentElements = cyInstance.elements().jsons(); // 現在のelementsをここで取っておく
+      // 描画
+      // console.log('adding elements...');
+      cyInstance.add(concatElements);
+      // console.log('added elements!');
+      
+      currentElements = cyInstance.elements().jsons(); // 現在のelementsをここで取っておく
 
-        gtag('event', 'elements_amounts', {value: concatElements.length});
-      }
+      gtag('event', 'elements_amounts', {value: concatElements.length});
     } else {
       messageInfoAlert = 'No new relationship data for this user was found in "Hirogaru-Bluesky!".';
       showInfoAlert = true;
@@ -149,7 +142,8 @@
   }
 
   function removeGraph() {
-    cyInstance.remove(cyInstance.elements());
+    cyInstance.elements().remove();
+    currentElements = [];
   }
 
   function setRandomColorsForCompoundElements(elements) {
