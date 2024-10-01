@@ -8,7 +8,7 @@
 
   <div class="font-orbitron text-xl mb-4">{LATEST_VER}</div>
 
-  <div class="description text-md md:text-lg">
+  <div class="description text-md md:text-lg w-3/4 md:w-full mx-auto">
     <p>Blu-lyzer is a Bluesky post analysis tool.</p>
     <p>No login or installation required.</p>
     <p>Enter your Bluesky handle (without "@") and generate a graph!</p>

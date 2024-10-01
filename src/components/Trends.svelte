@@ -79,8 +79,8 @@
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
         <Tooltip class="z-10 text-xs">
           Blu-lyzerユーザのトレンドワード<br>
-          Inc. Rateは増加率。昨日に対してどれだけ多くポストされたかを表示<br>
-          Countは単純な合計。今日ポストされた回数を表示
+          Inc. Rateは増加率。前回更新時から何倍多くポストされたかを表示<br>
+          Countは単純にポストされた回数の合計を表示<br>
         </Tooltip>
       </span>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
@@ -129,13 +129,7 @@
   </div>
   {#if isRunning}
     <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
-      <div class="flex-col text-sm justify-center items-center text-center">
-        <Spinner size={16} class="mb-2" />
-        <p>読み込み中...</p>
-        <p>20~30秒ほどかかります</p>
-        <p>タブを閉じても処理は継続するので</p>
-        <p>他のメニューをお楽しみください</p>
-      </div>
+      <Spinner size={16} />
     </div>
   {/if}
 </Drawer>

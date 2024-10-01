@@ -2,7 +2,10 @@
 import flowbitePlugin from 'flowbite/plugin'
 
 export default {
-  content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}'],
+  content: [
+    './src/components/*.{html,js,svelte,ts}',
+    './src/routes/*.{html,js,svelte,ts}',
+    './node_modules/flowbite-svelte/**/*.{html,js,svelte,ts}'],
 
   theme: {
     extend: {

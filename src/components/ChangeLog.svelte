@@ -13,9 +13,9 @@
 <Modal title="よくある質問" bind:open={isOpenChangeLog} autoclose outsideclose>
 	<div>
     {#each changelog as cl}
-      <h1 class="text-xl font-bold mt-2">{cl.version}</h1>
+      <h1 class="text-xl font-bold">{cl.version}</h1>
       {#each cl.changes as desc}
-        <p>{@html desc}</p>  
+        <p class="mb-2">{@html desc}</p>  
       {/each}
     {/each}
 	</div>

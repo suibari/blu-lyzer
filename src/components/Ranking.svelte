@@ -80,33 +80,14 @@
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
         <Tooltip class="z-10 text-xs">
           Blu-lyzerユーザのランキング<br>
+          Influencerはフォロワー/フォロー数から算出した値<br>
           ぶる廃! はBlueskyでの活動頻度<br>
-          Influencerはフォロワー/フォロー数
         </Tooltip>
       </span>
       <CloseButton on:click={() => (isRankingHidden = true)} class="mb-4 dark:text-white" />
     </div>
     <Tabs>
-      <TabItem open title="ぶる廃!">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          <div class="mt-4 space-y-4">
-            {#each rankingAddict as rank, i}
-              <div class="flex items-center">
-                <p class={"w-8 text-md"}>{i+1}.</p>
-                <div class="flex w-10 justify-center mr-2">
-                  <a href={`https://bsky.app/profile/${rank.handle}`} target="_blank" rel="noopener noreferrer">
-                    <Avatar src={rank.img} rounded />
-                  </a>
-                </div>
-                <div class="flex-col w-32">
-                  <p class={"text-lg font-bold truncate"}>{rank.name}</p>
-                  <p class={"text-xs text-right"}>{Math.round(rank.averageInterval * 100) / 100} [s/act]</p>
-                </div>
-              </div>
-            {/each}
-          </div>
-      </TabItem>
-      <TabItem title="Influencer">
+      <TabItem open title="Influencer">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
             {#each rankingInfluencer as rank, i}
@@ -123,6 +104,25 @@
                 </div>
               </div>
             {/each}    
+          </div>
+      </TabItem>
+      <TabItem title="ぶる廃!">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          <div class="mt-4 space-y-4">
+            {#each rankingAddict as rank, i}
+              <div class="flex items-center">
+                <p class={"w-8 text-md"}>{i+1}.</p>
+                <div class="flex w-10 justify-center mr-2">
+                  <a href={`https://bsky.app/profile/${rank.handle}`} target="_blank" rel="noopener noreferrer">
+                    <Avatar src={rank.img} rounded />
+                  </a>
+                </div>
+                <div class="flex-col w-32">
+                  <p class={"text-lg font-bold truncate"}>{rank.name}</p>
+                  <p class={"text-xs text-right"}>{Math.round(rank.averageInterval * 100) / 100} [s/act]</p>
+                </div>
+              </div>
+            {/each}
           </div>
       </TabItem>
     </Tabs>
