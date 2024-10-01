@@ -14,7 +14,10 @@
 	import License from '../components/License.svelte';
 	import Title from '../components/Title.svelte';
 	import ChangeLog from '../components/ChangeLog.svelte';
+	import Trends from '../components/Trends.svelte';
+	import Ranking from '../components/Ranking.svelte';
 
+  let LATEST_VER;
   let elements = [];
   let tappedNode = null;
   let recentFriends = [];
@@ -88,6 +91,7 @@
 
 <Title
   {isVisible}
+  {LATEST_VER}
 />
 
 <Navbar class="fixed top-0 left-0 w-full bg-primary-900 text-white z-10">
@@ -124,8 +128,12 @@
   />
 </div>
 
+<Trends/>
+
+<Ranking/>
+
 {#if isRunning}
-  <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-5">
+  <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-40">
     <Spinner size={16} />
   </div>
 {/if}
@@ -155,6 +163,7 @@
 
 <ChangeLog
   bind:isOpenChangeLog
+  bind:LATEST_VER
 />
 
 <License
