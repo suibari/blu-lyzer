@@ -15,6 +15,7 @@
   };
   let trendsToday = [];
   let trendsIncRate = [];
+  let updatedAt = "";
 
   async function handleTrends() {
     isTrendsHidden = false;
@@ -28,6 +29,7 @@
           const result = await response.json();
           trendsToday = result.trendsToday;
           trendsIncRate = result.trendsIncRate;
+          updatedAt = result.updatedAt;
 
           // console.log(result.trends);
         } else {
@@ -93,7 +95,7 @@
                 <p class={`w-2/4 ${getClass(i)}`}>
                   <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
                 </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}x</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count)}x</p>
               </div>
             {/each}    
           </div>
@@ -107,12 +109,23 @@
                 <p class={`w-2/4 ${getClass(i)}`}>
                   <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
                 </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count)}</p>
               </div>
             {/each}    
           </div>
       </TabItem>
     </Tabs>
+    <div>
+      <p class="text-xs text-right mt-2">Last Update: {new Date(updatedAt).toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })}</p>
+    </div>
   </div>
   {#if isRunning}
     <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">

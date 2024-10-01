@@ -17,6 +17,7 @@
 	import Trends from '../components/Trends.svelte';
 	import Ranking from '../components/Ranking.svelte';
 
+  let LATEST_VER;
   let elements = [];
   let tappedNode = null;
   let recentFriends = [];
@@ -90,6 +91,7 @@
 
 <Title
   {isVisible}
+  {LATEST_VER}
 />
 
 <Navbar class="fixed top-0 left-0 w-full bg-primary-900 text-white z-10">
@@ -161,6 +163,7 @@
 
 <ChangeLog
   bind:isOpenChangeLog
+  bind:LATEST_VER
 />
 
 <License
