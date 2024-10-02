@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.2.1",
+    "date": "",
+    "changes": [
+      "トレンド(Inc. Rate)の計算ミスを修正。申し訳ございませんでした",
+      "ランキング各ユーザのよく使う言葉を表示する機能追加",
+    ]
+  },
+  {
     "version": "v0.2.0",
     "date": "",
     "changes": [

@@ -109,7 +109,7 @@
                 <p class={`w-2/4 ${getClass(i)}`}>
                   <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
                 </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count)}</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
               </div>
             {/each}    
           </div>

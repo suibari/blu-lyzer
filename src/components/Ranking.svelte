@@ -33,7 +33,7 @@
           rankingInfluencer = result.rankingInfluencer;
           updatedAt = result.updatedAt;
   
-          // console.log(result.trends);
+          // console.log(rankingInfluencer);
         } else {
           throw new Error('bad response');
         }
@@ -89,10 +89,10 @@
     </div>
     <Tabs>
       <TabItem open title="Influencer">
-        <RankingItem ranking={rankingInfluencer} />
+        <RankingItem ranking={rankingInfluencer} unit="pts" />
       </TabItem>
       <TabItem title="ぶる廃!">
-        <RankingItem ranking={rankingAddict} />
+        <RankingItem ranking={rankingAddict} unit="s/act" />
       </TabItem>
     </Tabs>
     <div>

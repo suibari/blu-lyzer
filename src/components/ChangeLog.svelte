@@ -15,8 +15,9 @@
     {#each changelog as cl}
       <h1 class="text-xl font-bold">{cl.version}</h1>
       {#each cl.changes as desc}
-        <p class="mb-2">{@html desc}</p>  
+        <p>{@html desc}</p>  
       {/each}
+      <div class="mb-2" />
     {/each}
 	</div>
 </Modal>
