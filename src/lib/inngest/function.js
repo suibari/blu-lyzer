@@ -13,7 +13,7 @@ const RADIUS_CLIP = 1;
 
 // 自分+周辺のelementsアップデート、自分+周辺のrecordsアップデートを行うワークフロー
 export const workflow = inngest.createFunction(
-  "Sequential Workflow with Handles",
+  { id: "Sequential Workflow with Handles" },
   { event: "blu-lyzer/start.workflow" },  // ワークフローのトリガー
   async ({ event, step }) => {
     const handle = event.data.handle;
