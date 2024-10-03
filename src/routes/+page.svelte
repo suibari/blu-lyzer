@@ -18,7 +18,7 @@
 	import Ranking from '../components/Ranking.svelte';
 
   let LATEST_VER;
-  let elements = [];
+  let currentElements = [];
   let tappedNode = null;
   let recentFriends = [];
   let isRunning = false;
@@ -122,13 +122,14 @@
 <div class="z-1">
   <Graph
     bind:updateElementsOnGraph
+    bind:currentElements
     bind:isRunning
     bind:tappedNode
     bind:recentFriends
   />
 </div>
 
-<Trends/>
+<Trends {currentElements} />
 
 <Ranking/>
 

@@ -123,7 +123,7 @@
 <div class="user-card">
   <Card class="max-w-none">
     {#if (tappedNode && tappedNode.data('name'))}
-      <div class="flex items-center overflow-x-scroll overflow-y-hidden whitespace-nowrap hide-scrollbar">
+      <div class="flex items-center overflow-x-scroll overflow-y-hidden whitespace-nowrap hidden-scrollbar">
         <!-- アバター欄 -->
         <div class="flex-col mr-2 w-36 flex-shrink-0">
           <div class="w-36 h-36 flex-shrink-0">
@@ -280,13 +280,5 @@
     max-width: 860px;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
   }
 </style>

@@ -5,9 +5,11 @@
   import { FireOutline, ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
 
+  export let currentElements= [];
   let isFirstRun = true;
   let isRunning = false;
   let isTrendsHidden = true;
+  let showNeighborTrends = false;
   let transitionParams = {
     x: -320,
     duration: 200,
@@ -16,6 +18,7 @@
   let trendsToday = [];
   let trendsIncRate = [];
   let updatedAt = "";
+  let wordFreqMapElements = [];
 
   async function handleTrends() {
     isTrendsHidden = false;
@@ -55,6 +58,46 @@
       return 'text-sm'; // それ以降
     }
   }
+
+  // elementsトレンド更新処理
+  $: {
+    const wordFreqMapElementsObj = {};
+    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 1日をミリ秒に変換
+    const currentTime = new Date().getTime(); // 現在の時間
+
+    if (currentElements.length > 0) {
+      currentElements
+        .filter(element => element.group === 'nodes' && element.data.wordFreqMap)
+        .forEach(node => {
+          node.data.wordFreqMap.forEach(word => {
+            const { noun, count, occurrences } = word;
+
+            // 1日以内の occurrences の数をカウント
+            const recentOccurrences = occurrences.filter(occurrence => {
+              const occurrenceTime = new Date(occurrence.timestamp).getTime();
+              return currentTime - occurrenceTime <= oneDayInMilliseconds;
+            }).length;
+
+            // recentOccurrences の数を count に加算
+            if (recentOccurrences > 0) {
+              if (wordFreqMapElementsObj[noun]) {
+                wordFreqMapElementsObj[noun] += recentOccurrences;
+              } else {
+                wordFreqMapElementsObj[noun] = recentOccurrences;
+              }
+            }
+          });
+        });
+
+      wordFreqMapElements = Object.entries(wordFreqMapElementsObj)
+        .map(([noun, count]) => ({ noun, count })) // noun と count のオブジェクトに変換
+        .sort((a, b) => b.count - a.count); // count で降順ソート
+
+      showNeighborTrends = true;
+    } else {
+      showNeighborTrends = false;
+    }
+  }
 </script>
 
 <!-- タブ型ボタン -->
@@ -85,8 +128,8 @@
       </span>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
-    <Tabs>
-      <TabItem open title="Inc. Rate">
+    <Tabs defaultClass="flex overflow-x-auto whitespace-nowrap hidden-scrollbar">
+      <TabItem open title="Inc. Rate" defaultClass="flex-none">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
             {#each trendsIncRate as trend, i}
@@ -100,7 +143,7 @@
             {/each}    
           </div>
       </TabItem>
-      <TabItem title="Count">
+      <TabItem title="Count" defaultClass="flex-none">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
             {#each trendsToday as trend, i}
@@ -114,6 +157,22 @@
             {/each}    
           </div>
       </TabItem>
+      {#if showNeighborTrends}
+        <TabItem title="Neighbor" defaultClass="flex-none">
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="mt-4 space-y-4">
+              {#each wordFreqMapElements.slice(0, 100) as trend, i}
+                <div class="flex">
+                  <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
+                  <p class={`w-2/4 ${getClass(i)}`}>
+                    <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
+                  </p>
+                  <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+                </div>
+              {/each}    
+            </div>
+        </TabItem>
+      {/if}
     </Tabs>
     <div>
       <p class="text-xs text-right mt-2">Last Update: {new Date(updatedAt).toLocaleString('ja-JP', {

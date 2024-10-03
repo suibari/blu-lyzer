@@ -19,7 +19,7 @@
   let container;
   let cyInstance = null;
   let concatElements = [];
-  let currentElements = [];
+  export let currentElements = [];
   let showInfoAlert = false;
   let messageInfoAlert = "";
 
