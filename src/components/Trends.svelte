@@ -3,6 +3,8 @@
   import { Tabs, TabItem } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
   import { FireOutline, ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
+  import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider } from 'flowbite-svelte';
+  import { Popover } from 'flowbite-svelte';
   import { sineIn } from 'svelte/easing';
 
   export let currentElements= [];
@@ -81,16 +83,20 @@
             // recentOccurrences の数を count に加算
             if (recentOccurrences > 0) {
               if (wordFreqMapElementsObj[noun]) {
-                wordFreqMapElementsObj[noun] += recentOccurrences;
+                wordFreqMapElementsObj[noun].count += recentOccurrences;
+                wordFreqMapElementsObj[noun].nodes.push(node.data);
               } else {
-                wordFreqMapElementsObj[noun] = recentOccurrences;
+                wordFreqMapElementsObj[noun] = {
+                  count: recentOccurrences,
+                  nodes: [node.data],
+                }
               }
             }
           });
         });
 
       wordFreqMapElements = Object.entries(wordFreqMapElementsObj)
-        .map(([noun, count]) => ({ noun, count })) // noun と count のオブジェクトに変換
+        .map(([noun, { count, nodes }]) => ({ noun, count, nodes })) // noun, count, nodes のオブジェクトに変換
         .sort((a, b) => b.count - a.count); // count で降順ソート
 
       showNeighborTrends = true;
@@ -164,9 +170,17 @@
               {#each wordFreqMapElements.slice(0, 100) as trend, i}
                 <div class="flex">
                   <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                  <p class={`w-2/4 ${getClass(i)}`}>
-                    <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
-                  </p>
+                  <p id="t{i}" class={`w-2/4 ${getClass(i)}`}>{trend.noun}</p>
+                  <Popover triggeredBy="#t{i}">
+                    <div class="flex-col">
+                      {#each trend.nodes as node}
+                        <div class="flex items-center">
+                          <Avatar src="{node.img}" />
+                          <p class="font-bold ml-2">{node.name}</p>
+                        </div>
+                      {/each}
+                    </div>
+                  </Popover>
                   <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
                 </div>
               {/each}    
