@@ -2,7 +2,7 @@ import { BSKY_IDENTIFIER, BSKY_APP_PASSWORD } from '$env/static/private';
 import { inngest } from './inngest';
 import { agent } from '../server/bluesky';
 import { getElements } from '$lib/server/element';
-import { analyzeRecords } from '$lib/server/submodule/src/analyze';
+import { analyzeRecords } from '$lib/submodule/src/analyze';
 import { TimeLogger } from '$lib/server/logger';
 import { supabase } from '$lib/server/supabase';
 

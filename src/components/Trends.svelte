@@ -2,16 +2,19 @@
   import { Drawer, Button, CloseButton, Tooltip } from 'flowbite-svelte';
   import { Tabs, TabItem } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
-  import { FireOutline, ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
+  import { FireOutline, ArrowRightOutline, InfoCircleSolid, ChartOutline } from 'flowbite-svelte-icons';
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider } from 'flowbite-svelte';
   import { Popover } from 'flowbite-svelte';
+  import { Badge } from 'flowbite-svelte';
   import { sineIn } from 'svelte/easing';
+  import { calculateEMA } from '$lib/submodule/src/statistics/average';
 
   export let currentElements= [];
+  export let updatedNeighborTrends = false;
+  let showNeighborTrends = false;
   let isFirstRun = true;
   let isRunning = false;
   let isTrendsHidden = true;
-  let showNeighborTrends = false;
   let transitionParams = {
     x: -320,
     duration: 200,
@@ -24,6 +27,7 @@
 
   async function handleTrends() {
     isTrendsHidden = false;
+    updatedNeighborTrends = false;
 
     if (isFirstRun && !isRunning) {
       isRunning = true;
@@ -64,44 +68,57 @@
   // elementsトレンド更新処理
   $: {
     const wordFreqMapElementsObj = {};
-    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 1日をミリ秒に変換
-    const currentTime = new Date().getTime(); // 現在の時間
 
     if (currentElements.length > 0) {
+      const now = new Date(); // 現在時刻
+
+      // まず、全nodeのwordFreqMapをword単位でマージ
       currentElements
         .filter(element => element.group === 'nodes' && element.data.wordFreqMap)
         .forEach(node => {
           node.data.wordFreqMap.forEach(word => {
-            const { noun, count, occurrences } = word;
+            const occurrences = word.occurrences;
 
-            // 1日以内の occurrences の数をカウント
-            const recentOccurrences = occurrences.filter(occurrence => {
-              const occurrenceTime = new Date(occurrence.timestamp).getTime();
-              return currentTime - occurrenceTime <= oneDayInMilliseconds;
-            }).length;
+            if (!wordFreqMapElementsObj[word.noun]) {
+              wordFreqMapElementsObj[word.noun] = {
+                hourlyCounts: Array(24).fill(0), // 全nodeでのhourlyCountsを集計するため
+                nodes: [], // 各nodeのデータ
+              };
+            }
 
-            // recentOccurrences の数を count に加算
-            if (recentOccurrences > 0) {
-              if (wordFreqMapElementsObj[noun]) {
-                wordFreqMapElementsObj[noun].count += recentOccurrences;
-                wordFreqMapElementsObj[noun].nodes.push(node.data);
-              } else {
-                wordFreqMapElementsObj[noun] = {
-                  count: recentOccurrences,
-                  nodes: [node.data],
+            // 各出現時間を1時間ごとに集計
+            occurrences.forEach(occurrence => {
+              const occurrenceTime = new Date(occurrence.timestamp);
+              const hoursAgo = Math.floor((now - occurrenceTime) / (1000 * 60 * 60));
+              if (hoursAgo >= 0 && hoursAgo < 24) {
+                wordFreqMapElementsObj[word.noun].hourlyCounts[hoursAgo]++;
+                if (!wordFreqMapElementsObj[word.noun].nodes.includes(node.data)) {
+                  wordFreqMapElementsObj[word.noun].nodes.push(node.data);
                 }
               }
-            }
+            });
           });
         });
 
+      // マージしたデータに対してEMAを計算し、結果を格納
+      Object.keys(wordFreqMapElementsObj).forEach(noun => {
+        const hourlyCounts = wordFreqMapElementsObj[noun].hourlyCounts;
+        const ema = calculateEMA(hourlyCounts, 12); // 指数移動平均を計算
+
+        // EMAとnodesを格納
+        wordFreqMapElementsObj[noun].ema = ema;
+      });
+
+      // 結果をソートして出力
       wordFreqMapElements = Object.entries(wordFreqMapElementsObj)
-        .map(([noun, { count, nodes }]) => ({ noun, count, nodes })) // noun, count, nodes のオブジェクトに変換
-        .sort((a, b) => b.count - a.count); // count で降順ソート
+        .map(([noun, { ema, nodes }]) => ({ noun, ema, nodes })) // noun, ema, nodes のオブジェクトに変換
+        .sort((a, b) => b.ema[0] - a.ema[0]); // 直近のema[0]で降順ソート
 
       showNeighborTrends = true;
+      updatedNeighborTrends = true;
     } else {
       showNeighborTrends = false;
+      updatedNeighborTrends = false;
     }
   }
 </script>
@@ -115,7 +132,16 @@
   >
     Trends
   </button>
+
+  <!-- elements更新時のバッジ -->
+  {#if updatedNeighborTrends}
+    <Badge rounded color="yellow" class="fixed top-[calc(-10%)] left-[20px] z-10">
+      <ChartOutline/>
+    </Badge>
+  {/if}
 </div>
+
+
 
 <!-- Drawer (左から展開するフレーム) -->
 <Drawer bind:hidden={isTrendsHidden} {transitionParams} placement="left" transitionType="fly" id="trendBar">
@@ -128,28 +154,14 @@
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
         <Tooltip class="z-10 text-xs">
           Blu-lyzerユーザのトレンドワード<br>
-          Inc. Rateは増加率。前回更新時から何倍多くポストされたかを表示<br>
-          Countは単純にポストされた回数の合計を表示<br>
+          AllはBlu-lyzer全体のトレンド<br>
+          Neighborは表示したネットワークグラフ内に限定したトレンド<br>
         </Tooltip>
       </span>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
     </div>
     <Tabs defaultClass="flex overflow-x-auto whitespace-nowrap hidden-scrollbar">
-      <TabItem open title="Inc. Rate" defaultClass="flex-none">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          <div class="mt-4 space-y-4">
-            {#each trendsIncRate as trend, i}
-              <div class="flex">
-                <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                <p class={`w-2/4 ${getClass(i)}`}>
-                  <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
-                </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count)}x</p>
-              </div>
-            {/each}    
-          </div>
-      </TabItem>
-      <TabItem title="Count" defaultClass="flex-none">
+      <TabItem open title="All" defaultClass="flex-none">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
             {#each trendsToday as trend, i}
@@ -175,13 +187,13 @@
                     <div class="flex-col">
                       {#each trend.nodes as node}
                         <div class="flex items-center">
-                          <Avatar src="{node.img}" />
+                          <Avatar src="{node.img}" href="https://bsky.app/profile/{node.handle}" target="_blank" />
                           <p class="font-bold ml-2">{node.name}</p>
                         </div>
                       {/each}
                     </div>
                   </Popover>
-                  <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+                  <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.ema[0]*100)}x</p>
                 </div>
               {/each}    
             </div>

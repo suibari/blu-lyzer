@@ -3,7 +3,6 @@
   // flowbite-svelte
   import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
   import { Spinner } from 'flowbite-svelte';
-  import { BarsOutline } from 'flowbite-svelte-icons';
   // my components
 	import Graph from "../components/Graph.svelte";
 	import UserCard from "../components/UserCard.svelte";
@@ -17,6 +16,7 @@
 	import Trends from '../components/Trends.svelte';
 	import Ranking from '../components/Ranking.svelte';
 
+  // variables
   let LATEST_VER;
   let currentElements = [];
   let tappedNode = null;
@@ -29,6 +29,7 @@
   let isOpenAbout, isOpenQA, isOpenDisclaimer, isOpenChangeLog, isOpenLicense = false;
   let isVisible = true;
   let isNallowWindow = false;
+  // functions
   let updateElementsOnGraph; // Graphの子関数
 
   onMount(() => {

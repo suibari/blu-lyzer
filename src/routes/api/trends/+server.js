@@ -9,7 +9,6 @@ export async function GET({ request }) {
     console.log(`[INFO] send trends object.`);
     return new Response(JSON.stringify({
       trendsToday: trends.data.trendsToday.slice(0, 100),
-      trendsIncRate: trends.data.trendsIncRate.slice(0, 100),
       updatedAt: trends.updated_at,
     }), {
       headers: { 'Content-Type': 'application/json' }
