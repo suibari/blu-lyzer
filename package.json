@@ -9,7 +9,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"sm_init": "git submodule update --init --recursive",
-		"sm_install": "cd src/lib/server/submodule && npm install && cd -"
+		"sm_install": "cd src/lib/submodule && npm install && cd -"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
