@@ -91,7 +91,7 @@
           'font-size': newFontSize + 'px',
         })
         .update();
-    })
+    });
   })
 
   // elementsが変化したときのメインの処理

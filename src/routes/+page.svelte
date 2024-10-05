@@ -29,6 +29,7 @@
   let isOpenAbout, isOpenQA, isOpenDisclaimer, isOpenChangeLog, isOpenLicense = false;
   let isVisible = true;
   let isNallowWindow = false;
+  let messageLoading = "";
   // functions
   let updateElementsOnGraph; // Graphの子関数
 
@@ -42,6 +43,7 @@
     const isCreateGraph = detail.isCreateGraph;
     isRunning = true;
     isVisible = false;
+    messageLoading = "Collecting Data..."
 
     // 過去に解析したかチェック
     isAnalyzed = analyzedHandleArray.includes(handle);
@@ -73,6 +75,7 @@
     }
 
     // 成功: 1件以上の相関図データが取得
+    messageLoading = "Drawing Graph..."
     const result = await response.json();
     updateElementsOnGraph(result.elements, isCreateGraph);
     // elements = result.elements;
@@ -137,8 +140,9 @@
 <Ranking/>
 
 {#if isRunning}
-  <div class="absolute top-0 left-0 flex justify-center items-center w-full h-full z-40">
+  <div class="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full z-40">
     <Spinner size={16} />
+    <p class="text-2xl font-bold text-primary-800">{messageLoading}</p>
   </div>
 {/if}
 
