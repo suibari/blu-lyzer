@@ -15,9 +15,7 @@
     duration: 200,
     easing: sineIn
   };
-  let rankingAddict = [];
-  let rankingInfluencer = [];
-  let updatedAt = "";
+  let ranking = {};
 
   async function handleRanking() {
     isRankingHidden = false;
@@ -29,9 +27,7 @@
         const response = await fetch('/api/ranking');
         if (response.ok) {
           const result = await response.json();
-          rankingAddict = result.rankingAddict;
-          rankingInfluencer = result.rankingInfluencer;
-          updatedAt = result.updatedAt;
+          ranking = result;
   
           // console.log(rankingInfluencer);
         } else {
@@ -57,6 +53,15 @@
       return 'text-sm'; // それ以降
     }
   }
+
+  function calculateActiveInfluencer(rankingInfluencer) {
+    rankingInfluencer.forEach(rank => {
+      rank.score = Math.log10(rank.score);
+      rank.score = rank.score * rank.averageInterval
+    });
+
+    return rankingInfluencer; // 変更された配列をそのまま返す
+  }
 </script>
 
 <!-- タブ型ボタン -->
@@ -81,22 +86,22 @@
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
         <Tooltip class="z-10 text-xs">
           Blu-lyzerユーザのランキング<br>
-          Influencerはフォロワー/フォロー数から算出した値<br>
-          ぶる廃! はBlueskyでの活動頻度<br>
+          Influencerは影響力の高いアカウント。フォロワー数や活動頻度をもとに算出<br>
+          ぶる杯! はBlueskyでの活動頻度の高いアカウント<br>
         </Tooltip>
       </span>
       <CloseButton on:click={() => (isRankingHidden = true)} class="mb-4 dark:text-white" />
     </div>
     <Tabs>
       <TabItem open title="Influencer">
-        <RankingItem ranking={rankingInfluencer} unit="pts" />
+        <RankingItem ranking={ranking.rankingActiveInfluencer} unit="pts" />
       </TabItem>
-      <TabItem title="ぶる廃!">
-        <RankingItem ranking={rankingAddict} unit="s/act" />
+      <TabItem title="ぶる杯!">
+        <RankingItem ranking={ranking.rankingAddict} unit="s/act" />
       </TabItem>
     </Tabs>
     <div>
-      <p class="text-xs text-right mt-2">Last Update: {new Date(updatedAt).toLocaleString('ja-JP', {
+      <p class="text-xs text-right mt-2">Last Update: {new Date(ranking.updatedAt).toLocaleString('ja-JP', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

@@ -10,6 +10,7 @@ export async function GET({ request }) {
     return new Response(JSON.stringify({
       rankingAddict: ranking.data.rankingAddict.slice(0, 100),
       rankingInfluencer: ranking.data.rankingInfluencer.slice(0, 100),
+      rankingActiveInfluencer: ranking.data.rankingActiveInfluencer.slice(0, 100),
       updatedAt: ranking.updated_at,
     }), {
       headers: { 'Content-Type': 'application/json' }
