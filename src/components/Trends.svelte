@@ -20,9 +20,11 @@
     duration: 200,
     easing: sineIn
   };
-  let trendsToday = [];
-  let trendsIncRate = [];
-  let updatedAt = "";
+  let trends = {
+    trendsToday: [],
+    trendsIncRate: [],
+    trendsEma: [],
+  };
   let wordFreqMapElements = [];
 
   async function handleTrends() {
@@ -35,12 +37,10 @@
       try {
         const response = await fetch('/api/trends');
         if (response.ok) {
-          const result = await response.json();
-          trendsToday = result.trendsToday;
-          trendsIncRate = result.trendsIncRate;
-          updatedAt = result.updatedAt;
+          const results = await response.json();
+          trends = results;
 
-          // console.log(result.trends);
+          // console.log(trends);
         } else {
           throw new Error('bad response');
         }
@@ -155,7 +155,7 @@
         <Tooltip class="z-10 text-xs">
           Blu-lyzerユーザのトレンドワード<br>
           AllはBlu-lyzer全体のトレンド<br>
-          Neighborは表示したネットワークグラフ内に限定したトレンド<br>
+          Neighborは表示したネットワークグラフ内に限定したトレンド(ネットワークグラフ生成後に表示)<br>
         </Tooltip>
       </span>
       <CloseButton on:click={() => (isTrendsHidden = true)} class="mb-4 dark:text-white" />
@@ -164,13 +164,13 @@
       <TabItem open title="All" defaultClass="flex-none">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
-            {#each trendsToday as trend, i}
+            {#each trends.trendsEma as trend, i}
               <div class="flex">
                 <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                <p class={`w-2/4 ${getClass(i)}`}>
+                <p class={`w-2/4 truncate ${getClass(i)}`}>
                   <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
                 </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{trend.count}</p>
+                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count[0]*100)}x</p>
               </div>
             {/each}    
           </div>
@@ -201,7 +201,7 @@
       {/if}
     </Tabs>
     <div>
-      <p class="text-xs text-right mt-2">Last Update: {new Date(updatedAt).toLocaleString('ja-JP', {
+      <p class="text-xs text-right mt-2">Last Update: {new Date(trends.updatedAt).toLocaleString('ja-JP', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

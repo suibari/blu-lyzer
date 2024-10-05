@@ -53,15 +53,6 @@
       return 'text-sm'; // それ以降
     }
   }
-
-  function calculateActiveInfluencer(rankingInfluencer) {
-    rankingInfluencer.forEach(rank => {
-      rank.score = Math.log10(rank.score);
-      rank.score = rank.score * rank.averageInterval
-    });
-
-    return rankingInfluencer; // 変更された配列をそのまま返す
-  }
 </script>
 
 <!-- タブ型ボタン -->
