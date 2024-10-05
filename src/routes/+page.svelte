@@ -36,13 +36,15 @@
     isNallowWindow = window.matchMedia("(max-width: 600px)").matches;
   })
 
-  async function expandGraph(event) {
+  async function createOrExpandGraph(event) {
     const detail = event.detail;
+    const handle = detail.handle;
+    const isCreateGraph = detail.isCreateGraph;
     isRunning = true;
     isVisible = false;
 
     // 過去に解析したかチェック
-    isAnalyzed = analyzedHandleArray.includes(detail.handle);
+    isAnalyzed = analyzedHandleArray.includes(handle);
     if (isAnalyzed) {
       messageErrorAlert = "This handle was already analyzed.";
       showErrorAlert = true;
@@ -56,7 +58,7 @@
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ handle: detail.handle })
+      body: JSON.stringify({ handle, isCreateGraph })
     });
 
     // 取得失敗
@@ -72,17 +74,17 @@
 
     // 成功: 1件以上の相関図データが取得
     const result = await response.json();
-    updateElementsOnGraph(result.elements, detail.isCreateGraph);
+    updateElementsOnGraph(result.elements, isCreateGraph);
     // elements = result.elements;
     // console.log(elements);
 
-    analyzedHandleArray.push(detail.handle);
+    analyzedHandleArray.push(handle);
 
     if (detail.setStrage) {
-      localStorage.setItem('handle', detail.handle);
+      localStorage.setItem('handle', handle);
     }
 
-    if (detail.isCreateGraph) {
+    if (isCreateGraph) {
       gtag('event', 'create_graph');
     } else {
       gtag('event', 'expand_graph');
@@ -148,7 +150,7 @@
 <UserCard
   bind:tappedNode
   {recentFriends}
-  on:expandGraph={expandGraph}
+  on:createOrExpandGraph={createOrExpandGraph}
 />
 
 <About

@@ -2,10 +2,10 @@ import { getData } from "$lib/server/router";
 
 export async function POST({ request }) {
   try {
-  const { handle } = await request.json();
+  const { handle, isCreateGraph } = await request.json();
   console.log(`[INFO] received request: ${handle}`);
 
-  const elements = await getData(handle);
+  const elements = await getData(handle, isCreateGraph);
 
   console.log(`[INFO] send elements object: ${elements.length}`);
   return new Response(JSON.stringify({ elements }), {

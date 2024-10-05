@@ -99,7 +99,7 @@
   }
 
   $: {
-    if (tappedNode && tappedNode.data('name')) {
+    if (tappedNode && tappedNode.data('handle')) {
       promiseImgTappedNode = getProxyUrlForImage(tappedNode.data('img'));
     }
   }
@@ -122,7 +122,7 @@
 
 <div class="user-card">
   <Card class="max-w-none">
-    {#if (tappedNode && tappedNode.data('name'))}
+    {#if (tappedNode && tappedNode.data('handle'))}
       <div class="flex items-center overflow-x-scroll overflow-y-hidden whitespace-nowrap hidden-scrollbar">
         <!-- アバター欄 -->
         <div class="flex-col mr-2 w-36 flex-shrink-0">
@@ -230,7 +230,7 @@
               </div>
             </div>
           </div>
-          <Button class="w-fit h-10 mt-1" on:click={() => dispatch('expandGraph', {handle: tappedNode.data('handle')})}>
+          <Button class="w-fit h-10 mt-1" on:click={() => dispatch('createOrExpandGraph', {handle: tappedNode.data('handle')})}>
             Expand Graph! <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
           </Button>
         </div>
@@ -261,7 +261,7 @@
           placeholder="handle.bsky.social"
           class="w-2/3"
         />
-        <Button class="w-100 h-10 ml-2 mt-2" on:click={() => dispatch('expandGraph', {handle: inputHandle, setStrage: true, isCreateGraph: true})}>
+        <Button class="w-100 h-10 ml-2 mt-2" on:click={() => dispatch('createOrExpandGraph', {handle: inputHandle, setStrage: true, isCreateGraph: true})}>
           Create New Graph!
           <ArrowRightOutline class="w-6 h-6 ms-2 text-white" />
         </Button>

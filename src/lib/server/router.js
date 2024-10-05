@@ -3,18 +3,15 @@ import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { getConcatElementsAroundHandle, expandElementsGradually } from "./element";
 import { inngest } from '$lib/inngest/inngest';
-import { err } from 'inngest/types';
 
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1;
 const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+const MAX_NODES_ON_EXPAND = 30;
 
-export async function getData(handle) {
-  let radius_thrd = 0;
-  let filteredData = [];
-  let elementsRaw = [];
+export async function getData(handle, isCreateGraph) {
   let elements = [];
 
   // 特殊文字エスケープ
@@ -72,8 +69,16 @@ export async function getData(handle) {
     }
 
     // ----------------
+    // データ削減処理
+    // Expand時のノード量をMAX_NODES_ON_EXPAND個を残して削減
+    let nodes = elements.filter(element => (element.group === 'nodes'));
+    if (nodes.length > MAX_NODES_ON_EXPAND) {
+      nodes.splice(MAX_NODES_ON_EXPAND);
+    }
+    elements = elements.filter(elements => elements.group !== 'nodes').concat(nodes);
+
+    // ----------------
     // 解析データセット
-    const nodes = elements.filter(element => (element.group === 'nodes'));
     const handles = nodes.map(node => node.data.handle);
     ({data, error} = await supabase.from('records').select('handle, result_analyze').in('handle', handles)); // 周辺ユーザの解析データ取得
     if (!error) {
