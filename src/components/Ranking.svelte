@@ -7,6 +7,7 @@
   import { sineIn } from 'svelte/easing';
   import { Toggle } from 'flowbite-svelte';
 	import RankingItem from './RankingItem.svelte';
+	import MediaTimeline from './MediaTimeline.svelte';
 
   let isFirstRun = true;
   let isRunning = false;
@@ -18,6 +19,9 @@
   };
   let ranking = {};
   let isVisivleMedia;
+  let selectRank = {};
+  let media = []
+  let showMediaTimeline = false;
 
   async function handleRanking() {
     isRankingHidden = false;
@@ -59,10 +63,18 @@
 </div>
 
 <!-- Drawer (右から展開するフレーム) -->
-<Drawer bind:hidden={isRankingHidden} {transitionParams} placement="right" transitionType="fly" id="rankingBar" class="mb-0 pb-0">
-  <div class="p-4 relative">
-    <div class="flex items-center justify-center h-full w-full mb-2">
-      <h5 id="drawer-label" class="flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+<Drawer
+  bind:hidden={isRankingHidden}
+  {transitionParams}
+  placement="right"
+  transitionType="fly"
+  id="rankingBar"
+  class="mb-0 pb-0"
+  activateClickOutside={!showMediaTimeline}
+>
+  <div>
+    <div class="flex items-center justify-center h-full w-full p-4">
+      <h5 id="drawer-label" class="flex items-center text-base font-semibold text-gray-500 dark:text-gray-400">
         <UsersGroupSolid class="w-5 h-5 me-2.5 text-primary-500" />Ranking in<br>Blu-lyzer
       </h5>
       <span class="ml-1">
@@ -80,6 +92,10 @@
         <RankingItem
           ranking={ranking.rankingActiveInfluencer}
           {isVisivleMedia}
+          bind:isRunning
+          bind:selectRank
+          bind:media
+          bind:showMediaTimeline
           unit="pts"
         />
       </TabItem>
@@ -87,6 +103,10 @@
         <RankingItem
           ranking={ranking.rankingAddict}
           {isVisivleMedia}
+          bind:isRunning
+          bind:selectRank
+          bind:media
+          bind:showMediaTimeline
           unit="s/act"
         />
       </TabItem>
@@ -102,15 +122,23 @@
         hour12: false
       })}</p>
     </div>
-  </div>
-  {#if isRunning}
-    <div class="absolute inset-0 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
-      <Spinner size={16} />
-    </div>
-  {/if}
 
-  <!-- 常に画面の下に表示されるバー -->
-  <div class="sticky bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white from-60% to-transparent flex justify-center items-center z-20">
-    <Toggle bind:checked={isVisivleMedia} class="fixed bottom-4">Visible Media</Toggle>
+    {#if isRunning}
+      <div class="fixed top-1/2 right-32 flex justify-center items-center z-50 bg-gray-900 bg-opacity-0">
+        <Spinner size={16} />
+      </div>
+    {/if}
+
+    <!-- 常に画面の下に表示されるバー -->
+    <div class="sticky bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white from-60% to-transparent flex justify-center items-center">
+      <Toggle bind:checked={isVisivleMedia} class="fixed bottom-4">Visible Media</Toggle>
+    </div>
+
+    <!-- 黒フィルター: メディアタイムライン表示時に適用 -->
+    {#if showMediaTimeline}
+      <div class="fixed right-0 w-full top-0 h-full bg-gray-900 bg-opacity-75"></div>
+    {/if}
   </div>
 </Drawer>
+
+<MediaTimeline {selectRank} {media} bind:showMediaTimeline />

@@ -2,17 +2,18 @@
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
   import { ExclamationCircleOutline } from 'flowbite-svelte-icons'
   import { Popover } from 'flowbite-svelte';
-	import MediaTimeline from './MediaTimeline.svelte';
 
   export let ranking = [];
   export let isVisivleMedia = false;
   export let unit = "";
-  let showMediaTimeline = false;
-  let selectRank = {};
-  let media = [];
+  export let isRunning = false;
+  // for media-timeline
+  export let showMediaTimeline = false;
+  export let selectRank = {};
+  export let media = [];
 
   async function handleMedia(rank) {
-    // isRunning = true;
+    isRunning = true;
     selectRank = rank;
 
     try {
@@ -37,7 +38,7 @@
       throw new Error('failed to fetch');
     }
 
-    // isRunning = false;
+    isRunning = false;
   }
 </script>
 
@@ -53,12 +54,12 @@
               <div class="flex w-10 justify-center mr-2">
                 <Avatar src={rank.profile.avatar || '/img/defaultavator.png'} rounded />
               </div>
-              <div class="flex-col w-32">
+              <div class="flex-col w-40">
                 <p class={"text-lg font-bold truncate"}>{rank.profile.displayName}</p>
                 <p class={"text-xs text-right"}>{Math.round(rank.score*100)/100} [{unit}]</p>
               </div>
             </div>
-            <Popover triggeredBy="#r{i}" class="w-72 h-auto">
+            <Popover triggeredBy="#r{i}" class="w-72 h-auto z-10">
               <div class="flex-col">
                 <a href={`https://bsky.app/profile/${rank.handle}`} target="_blank" rel="noopener noreferrer">
                   <div class="relative">
@@ -122,5 +123,3 @@
     {/each}
   </div>
 {/if}
-
-<MediaTimeline {selectRank} {media} bind:showMediaTimeline />

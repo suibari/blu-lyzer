@@ -59,10 +59,19 @@ export class MyBlueskyer extends Blueskyer {
       return { records: [] };
     });
     const likeRecords = response.records;
+
+    // リポスト100件取得
+    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.repost", limit: 100}).catch(e => {
+      console.error(e);
+      console.warn(`[WARN] fetch error handle: ${handle}, so set empty object`);
+      return { records: [] };
+    });
+    const repostRecords = response.records;
   
     const records = {
       posts: postRecords,
       likes: likeRecords,
+      repost: repostRecords,
     }
     
     return records;
