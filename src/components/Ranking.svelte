@@ -5,6 +5,7 @@
   import { Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider, Tooltip } from 'flowbite-svelte';
   import { UsersGroupSolid, ArrowRightOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
   import { sineIn } from 'svelte/easing';
+  import { Toggle } from 'flowbite-svelte';
 	import RankingItem from './RankingItem.svelte';
 
   let isFirstRun = true;
@@ -16,6 +17,7 @@
     easing: sineIn
   };
   let ranking = {};
+  let isVisivleMedia;
 
   async function handleRanking() {
     isRankingHidden = false;
@@ -43,16 +45,6 @@
 
     isFirstRun = false;
   }
-
-  function getClass(index) {
-    if (index < 3) {
-      return 'text-xl'; // 2位〜10位
-    } else if (index >= 3 && index < 10) {
-      return 'text-base'; // 11位〜50位
-    } else {
-      return 'text-sm'; // それ以降
-    }
-  }
 </script>
 
 <!-- タブ型ボタン -->
@@ -67,11 +59,11 @@
 </div>
 
 <!-- Drawer (右から展開するフレーム) -->
-<Drawer bind:hidden={isRankingHidden} {transitionParams} placement="right" transitionType="fly" id="rankingBar">
+<Drawer bind:hidden={isRankingHidden} {transitionParams} placement="right" transitionType="fly" id="rankingBar" class="mb-0 pb-0">
   <div class="p-4 relative">
     <div class="flex items-center justify-center h-full w-full mb-2">
-      <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-        <UsersGroupSolid class="w-5 h-5 me-2.5 text-primary-500" />Ranking in<br>Blu-lyzer's Users
+      <h5 id="drawer-label" class="flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+        <UsersGroupSolid class="w-5 h-5 me-2.5 text-primary-500" />Ranking in<br>Blu-lyzer
       </h5>
       <span class="ml-1">
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
@@ -85,10 +77,18 @@
     </div>
     <Tabs>
       <TabItem open title="Influencer">
-        <RankingItem ranking={ranking.rankingActiveInfluencer} unit="pts" />
+        <RankingItem
+          ranking={ranking.rankingActiveInfluencer}
+          {isVisivleMedia}
+          unit="pts"
+        />
       </TabItem>
       <TabItem title="ぶる杯!">
-        <RankingItem ranking={ranking.rankingAddict} unit="s/act" />
+        <RankingItem
+          ranking={ranking.rankingAddict}
+          {isVisivleMedia}
+          unit="s/act"
+        />
       </TabItem>
     </Tabs>
     <div>
@@ -108,4 +108,9 @@
       <Spinner size={16} />
     </div>
   {/if}
+
+  <!-- 常に画面の下に表示されるバー -->
+  <div class="sticky bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white from-60% to-transparent flex justify-center items-center z-20">
+    <Toggle bind:checked={isVisivleMedia} class="fixed bottom-4">Visible Media</Toggle>
+  </div>
 </Drawer>

@@ -179,6 +179,34 @@ export class MyBlueskyer extends Blueskyer {
   
     return result;
   }
+
+  async getMedias(handle) {
+    const medias = [];
+
+    await this.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
+  
+    const {data} = await this.getAuthorFeed({actor: handle, limit: 100, filter: 'posts_with_media'}).catch(e => {
+      console.error(e);
+      console.warn(`[WARN] fetch error handle: ${handle}, so set empty object`);
+      return { data: {feed: []} };
+    });
+    // console.log(data);
+    data.feed.forEach(feed => {
+      // labeler識別
+      const labels = feed.post.labels;
+      
+      // 画像取得
+      const images = feed.post.embed.images;
+      if (images) {
+        images.forEach(image => {
+          image.labels = labels;
+          medias.push(image);
+        })
+      }
+    })
+  
+    return medias;
+  }
 }
 
 export const agent = new MyBlueskyer();

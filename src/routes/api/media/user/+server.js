@@ -1,16 +1,16 @@
-import { getData } from "$lib/server/router";
+import { agent } from "$lib/server/bluesky";
 
 export async function POST({ request }) {
   try {
-    const { handle, isCreateGraph } = await request.json();
-    console.log(`[INFO] received create/expand graph request: ${handle}`);
+    const { handle } = await request.json();
+    console.log(`[INFO] received media request: ${handle}`);
 
-    const elements = await getData(handle, isCreateGraph);
+    const media = await agent.getMedias(handle);
 
-    console.log(`[INFO] send elements object: ${elements.length}`);
-    return new Response(JSON.stringify({ elements }), {
+    console.log(`[INFO] send media object.`);
+    return new Response(JSON.stringify({ media }), {
       headers: { 'Content-Type': 'application/json' }
-    });
+  });
   } catch (e) {
     console.error(`[ERROR] ${e.message}`);
 

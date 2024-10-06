@@ -3,6 +3,8 @@ import { supabase } from "./supabase";
 import { removeDuplicatesNodes, removeInvalidNodesAndEdges, groupElementsWithCompoundNodes } from "../dataarranger";
 import { getConcatElementsAroundHandle, expandElementsGradually } from "./element";
 import { inngest } from '$lib/inngest/inngest';
+import { MyBlueskyer } from './bluesky';
+const agent = new MyBlueskyer();
 
 const RADIUS_THRD_INC_USER = 1;
 const RADIUS_CLIP = 1;
