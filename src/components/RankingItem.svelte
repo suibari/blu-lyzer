@@ -123,4 +123,4 @@
   </div>
 {/if}
 
-<MediaTimeline {selectRank} {media} {showMediaTimeline} />
+<MediaTimeline {selectRank} {media} bind:showMediaTimeline />
