@@ -1,5 +1,13 @@
 export const changelog = [
   {
+    "version": "v0.2.5",
+    "date": "",
+    "changes": [
+      "トレンドをfirehose(24hリアルタイム)試験対応",
+      "トレンドに24hの推移グラフ表示を追加",
+    ]
+  },
+  {
     "version": "v0.2.4",
     "date": "",
     "changes": [

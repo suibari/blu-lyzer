@@ -59,13 +59,13 @@
                 <p class={"text-xs text-right"}>{Math.round(rank.score*100)/100} [{unit}]</p>
               </div>
             </div>
-            <Popover triggeredBy="#r{i}" class="w-72 h-auto z-10">
+            <Popover triggeredBy="#r{i}" class="w-64 h-auto z-10">
               <div class="flex-col">
                 <a href={`https://bsky.app/profile/${rank.handle}`} target="_blank" rel="noopener noreferrer">
                   <div class="relative">
                     <img src={rank.profile.banner} alt="Banner of {rank.handle}" class="rounded-md" />
                     <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-white">
-                      <h3 class="absolute left-2 bottom-2 text-2xl font-bold text-gray-800 whitespace-nowrap overflow-hidden truncate w-60">{rank.profile.displayName || ""}</h3>
+                      <h3 class="absolute left-2 bottom-2 text-2xl font-bold text-gray-800 whitespace-nowrap overflow-hidden truncate w-full">{rank.profile.displayName || ""}</h3>
                     </div>
                   </div>
                 </a>
@@ -75,7 +75,6 @@
                   <h3 class="text-md font-bold ml-2">{rank.profile.followersCount}</h3>
                   <h5 class="text-xs ml-2">Interval:</h5>
                   <h3 class="text-md font-bold ml-2">{Math.round(rank.averageInterval*100/60)/100}</h3>
-                  <h5 class="text-xs ml-2">[m/act]</h5>
                 </div>
               </div>
             </Popover>

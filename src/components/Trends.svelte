@@ -8,6 +8,7 @@
   import { Badge } from 'flowbite-svelte';
   import { sineIn } from 'svelte/easing';
   import { calculateEMA } from '$lib/submodule/src/statistics/average';
+	import LineGraphTrend from './LineGraphTrend.svelte';
 
   export let currentElements= [];
   export let updatedNeighborTrends = false;
@@ -148,13 +149,13 @@
   <div class="p-4 relative">
     <div class="flex items-center justify-center h-full w-full mb-2">
       <h5 id="drawer-label" class="inline-flex items-center text-base font-semibold text-gray-500 dark:text-gray-400">
-        <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in<br>Blu-lyzer's Users
+        <FireOutline class="w-5 h-5 me-2.5 text-primary-500" />Trends in<br>Bluesky
       </h5>
       <span class="ml-1">
         <InfoCircleSolid class="w-5 h-5 ml-1 text-gray-500 cursor-pointer" />
         <Tooltip class="z-10 text-xs">
-          Blu-lyzerユーザのトレンドワード<br>
-          AllはBlu-lyzer全体のトレンド<br>
+          ユーザトレンドワード<br>
+          AllはBluesky全体のトレンド<br>
           Neighborは表示したネットワークグラフ内に限定したトレンド(ネットワークグラフ生成後に表示)<br>
         </Tooltip>
       </span>
@@ -165,14 +166,19 @@
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <div class="mt-4 space-y-4">
             {#each trends.trendsEma as trend, i}
-              <div class="flex">
-                <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
-                <p class={`w-2/4 truncate ${getClass(i)}`}>
-                  <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
-                </p>
-                <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count[0]*100)}x</p>
+              <div class="flex-col">
+                <div class="flex">
+                  <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
+                  <p class={`w-2/4 truncate ${getClass(i)}`}>
+                    <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
+                  </p>
+                  <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count[0])}x</p>
+                </div>
+                <div class="w-full h-20">
+                  <LineGraphTrend trend={trend.count} maxValue={Math.max(...trends.trendsEma.map(item => item.count).flat())} />
+                </div>
               </div>
-            {/each}    
+            {/each}
           </div>
       </TabItem>
       {#if showNeighborTrends}
