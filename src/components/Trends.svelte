@@ -167,15 +167,19 @@
           <div class="mt-4 space-y-4">
             {#each trends.trendsEma as trend, i}
               <div class="flex-col">
-                <div class="flex">
+                <div class="flex mb-1">
                   <p class={`w-1/4 ${getClass(i)}`}>{i+1}.</p>
                   <p class={`w-2/4 truncate ${getClass(i)}`}>
                     <a href="https://bsky.app/search?q={trend.noun}" target="_blank" class="text-black">{trend.noun}</a>
                   </p>
                   <p class={`w-1/4 text-right ${getClass(i)}`}>{Math.round(trend.count[0])}x</p>
                 </div>
-                <div class="w-full h-20">
-                  <LineGraphTrend trend={trend.count} maxValue={Math.max(...trends.trendsEma.map(item => item.count).flat())} />
+                <div class="flex justify-center w-full h-30">
+                  <LineGraphTrend
+                    trendSum={trends.trendsToday[i].count}
+                    trendAvg={trends.trendsEma[i].count}
+                    maxValue={Math.max(...trends.trendsToday.map(item => item.count).flat())}
+                  />
                 </div>
               </div>
             {/each}

@@ -1,11 +1,14 @@
 <script>
-  export let trend = [];
+  export let trendSum = [];
+  export let trendAvg = [];
   export let maxValue = 100; // グラフ全体での最大値を引数として受け取る
 
-  let linePoints = '';
+  let linePointsSum = '';
+  let linePointsAvg = '';
 
   $: {
-    linePoints = getLinePoints(trend);
+    linePointsSum = getLinePoints(trendSum);
+    linePointsAvg = getLinePoints(trendAvg);
   }
 
   // トレンドデータを右→左に反転して表示する
@@ -19,27 +22,38 @@
 </script>
 
 <div class="line-graph-wrapper">
-  <svg viewBox="0 0 100 50" preserveAspectRatio="none">
+  <svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
     <!-- 軸の線 -->
     <line x1="0" y1="50" x2="100" y2="50" stroke="#888" stroke-width="0.5" />
+    <!-- 縦軸の線 -->
+    <line x1="0" y1="0" x2="0" y2="50" stroke="#888" stroke-width="0.5" />
     
     <!-- グラフの線 -->
     <polyline 
       fill="none" 
       stroke="#3eb370" 
       stroke-width="1" 
-      points={linePoints} />
+      points={linePointsSum} />
+    <polyline 
+      fill="none" 
+      stroke="#ee7800" 
+      stroke-width="1" 
+      points={linePointsAvg} />
+
+    <!-- 横軸の時間ラベル -->
+    <text x="0" y="58" fill="#333" font-size="6" text-anchor="start">-23h</text>
+    <text x="50" y="58" fill="#333" font-size="6" text-anchor="middle">-12h</text>
+    <text x="100" y="58" fill="#333" font-size="6" text-anchor="end">-0h</text>
   </svg>
 </div>
 
 <style>
   .line-graph-wrapper {
-    width: 100%;
+    width: 90%;
     height: 100%;
   }
 
-  svg {
-    width: 100%;
-    height: 100%;
+  text {
+    font-family: Arial, sans-serif;
   }
 </style>
