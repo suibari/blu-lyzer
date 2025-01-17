@@ -8,8 +8,8 @@ import { supabase } from '$lib/server/supabase';
 
 const THRESHOLD_TL_MAX = 4000;
 const THRESHOLD_LIKES_MAX = 1000;
-const ELEM_NUM_PER_GROUP = 20;
-const RADIUS_CLIP = 1;
+const ELEM_NUM_PER_GROUP = 10;
+const RADIUS_CLIP = 2;
 
 // 自分+周辺のelementsアップデート、自分+周辺のrecordsアップデートを行うワークフロー
 export const workflow = inngest.createFunction(
@@ -26,7 +26,7 @@ export const workflow = inngest.createFunction(
     // 2. 配列の1~6番目のelement.data.handleを取得 (handlesForElements)
     const handlesForElements = elements.slice(1, RADIUS_CLIP*6).map(el => el.data.handle);
 
-    // 3. 配列の0~19番目のelement.data.handleを取得 (handlesForRecords)
+    // 3. 配列の0~9番目のelement.data.handleを取得 (handlesForRecords)
     const handlesForRecords = elements.slice(0, ELEM_NUM_PER_GROUP).map(el => el.data.handle);
 
     // 4. handlesForElementsに対して1つずつget-elements-and-update-dbを実行

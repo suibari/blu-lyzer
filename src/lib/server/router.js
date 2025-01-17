@@ -7,7 +7,7 @@ import { MyBlueskyer } from './bluesky';
 const agent = new MyBlueskyer();
 
 const RADIUS_THRD_INC_USER = 1;
-const RADIUS_CLIP = 1;
+const LIMITED_MODE_FRIENDS = 3;
 const THRESHOLD_TL_TMP = 100;
 const THRESHOLD_LIKES_TMP = 20;
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
@@ -66,7 +66,7 @@ export async function getData(handle, isCreateGraph) {
 
     } else {
       // 対象ハンドルが入っている相関図データがデータベースにないので制限モードで最低限のデータを返す
-      const elementsConcat = await getConcatElementsAroundHandle(handle, RADIUS_CLIP*6, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
+      const elementsConcat = await getConcatElementsAroundHandle(handle, LIMITED_MODE_FRIENDS, THRESHOLD_TL_TMP, THRESHOLD_LIKES_TMP);
       elements = expandElementsGradually(elementsConcat);
     }
 
