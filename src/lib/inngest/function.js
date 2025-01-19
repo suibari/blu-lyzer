@@ -23,24 +23,26 @@ export const workflow = inngest.createFunction(
       return await getElementsAndUpdateDbFunction(handle, true);
     });
     
-    // 2. 配列の1~3番目のelement.data.handleを取得 (handlesForElements)
-    const handlesForElements = elements.slice(1, RADIUS_CLIP*6).map(el => el.data.handle);
+    if (elements) {
+      // 2. 配列の1~3番目のelement.data.handleを取得 (handlesForElements)
+      const handlesForElements = elements.slice(1, RADIUS_CLIP*6).map(el => el.data.handle);
 
-    // 3. 配列の0~9番目のelement.data.handleを取得 (handlesForRecords)
-    const handlesForRecords = elements.slice(0, ELEM_NUM_PER_GROUP).map(el => el.data.handle);
+      // 3. 配列の0~9番目のelement.data.handleを取得 (handlesForRecords)
+      const handlesForRecords = elements.slice(0, ELEM_NUM_PER_GROUP).map(el => el.data.handle);
 
-    // 4. handlesForElementsに対して1つずつget-elements-and-update-dbを実行
-    for (const handleElement of handlesForElements) {
-      await step.run(`Get Elements for handle ${handleElement}`, async () => {
-        return await getElementsAndUpdateDbFunction(handleElement)
-      });
-    }
+      // 4. handlesForElementsに対して1つずつget-elements-and-update-dbを実行
+      for (const handleElement of handlesForElements) {
+        await step.run(`Get Elements for handle ${handleElement}`, async () => {
+          return await getElementsAndUpdateDbFunction(handleElement)
+        });
+      }
 
-    // 5. handlesForRecordsに対して1つずつget-records-and-update-dbを実行
-    for (const handleRecord of handlesForRecords) {
-      await step.run(`Get Records for handle ${handleRecord}`, async () => {
-        return await getRecordsAndUpdateDbFunction(handleRecord)
-      });
+      // 5. handlesForRecordsに対して1つずつget-records-and-update-dbを実行
+      for (const handleRecord of handlesForRecords) {
+        await step.run(`Get Records for handle ${handleRecord}`, async () => {
+          return await getRecordsAndUpdateDbFunction(handleRecord)
+        });
+      }
     }
   }
 );
@@ -87,7 +89,7 @@ export const getRecordsAndUpdateDbFunction =
 
     // recordsの更新時間を見て1時間以上なら更新する
     let {data, error} = await supabase.from('records').select('updated_at').eq('handle', handle);
-    if (data.length === 0 || (data.length === 1 && isPastOneHourOnUpdate(data[0].updated_at))) {
+    if (data.length === 0 || (data.length === 1 && isPastOneHourOnUpdate(data[0].updated_at)) || process.env.NODE_ENV === "development") {
 
       // Records
       await agent.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);

@@ -135,7 +135,7 @@
   />
 </div>
 
-<Trends {currentElements} />
+<!-- <Trends {currentElements} /> -->
 
 <Ranking/>
 

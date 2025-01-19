@@ -1,5 +1,12 @@
 export const changelog = [
   {
+    "version": "v0.2.7",
+    "date": "",
+    "changes": [
+      "バックグラウンド処理がPaaS上で行えなくなったことによる全体的な機能見直しのため、トレンド機能をオミット",
+    ]
+  },
+  {
     "version": "v0.2.6",
     "date": "",
     "changes": [

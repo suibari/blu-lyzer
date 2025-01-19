@@ -44,24 +44,24 @@ export class MyBlueskyer extends Blueskyer {
   
     await this.createOrRefleshSession(BSKY_IDENTIFIER, BSKY_APP_PASSWORD);
   
-    // ポスト50件取得
-    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.post", limit: 50}).catch(e => {
+    // ポスト100件取得
+    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.post", limit: 100}).catch(e => {
       console.error(e);
       console.warn(`[WARN] fetch error handle: ${handle}, so set empty object`);
       return { records: [] };
     });
     const postRecords = response.records;
   
-    // いいね50件取得
-    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.like", limit: 50}).catch(e => {
+    // いいね100件取得
+    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.like", limit: 100}).catch(e => {
       console.error(e);
       console.warn(`[WARN] fetch error handle: ${handle}, so set empty object`);
       return { records: [] };
     });
     const likeRecords = response.records;
 
-    // リポスト50件取得
-    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.repost", limit: 50}).catch(e => {
+    // リポスト100件取得
+    response = await this.listRecords({repo: handle, collection: "app.bsky.feed.repost", limit: 100}).catch(e => {
       console.error(e);
       console.warn(`[WARN] fetch error handle: ${handle}, so set empty object`);
       return { records: [] };
