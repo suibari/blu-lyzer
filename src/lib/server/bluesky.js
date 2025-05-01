@@ -149,7 +149,7 @@ export class MyBlueskyer extends Blueskyer {
       // オブジェクト配列からdidキーのみ抜いて配列化する
       didArray = resultArray.map(obj => obj.did);
       // 上位のみ抜き取る
-      didArray = didArray.slice(0, 1000);
+      // didArray = didArray.slice(0, 1000);
       // Profiles配列取得
       let friendsWithProf = [];
       if (didArray.length > 0) { // 誰にもリプライしてない人は実行しない
