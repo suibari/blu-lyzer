@@ -6,7 +6,7 @@ import { analyzeRecords } from '$lib/submodule/src/analyze';
 import { TimeLogger } from '$lib/server/logger';
 import { supabase } from '$lib/server/supabase';
 
-const THRESHOLD_TL_MAX = 3000;
+const THRESHOLD_TL_MAX = 4000;
 const THRESHOLD_LIKES_MAX = 1000;
 const ELEM_NUM_PER_GROUP = 20;
 const RADIUS_CLIP = 2;
